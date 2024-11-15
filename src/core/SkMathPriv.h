@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #endif
 #if defined(PK_BUILD_FOR_WIN)
-#include <intrin.h>
+#include <emmintrin.h>
+#include <intrin0.h>
 #endif
 
 namespace pk {

@@ -14,7 +14,7 @@
 namespace pk {
 class SkMutex : public std::mutex {
  public:
-  constexpr SkMutex() = default;
+  SkMutex() = default;
 
   void acquire() {
     lock();

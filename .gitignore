@@ -3,6 +3,7 @@
 *.iml
 .DS_Store
 .android_config
+.cache
 .gclient*
 .gradle
 .idea
@@ -11,6 +12,7 @@
 .recipe_deps/
 .settings/
 .win_toolchain/
+build
 TAGS
 bower_components
 imgui.ini
