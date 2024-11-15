@@ -1,5 +1,5 @@
-#include "src/gpu/geometry/GrPathUtils.cpp"
 #include "src/gpu/geometry/GrAATriangulator.cpp"
+#include "src/gpu/geometry/GrPathUtils.cpp"
 #include "src/gpu/geometry/GrTriangulator.cpp"
 
 #include "src/effects/SkCornerPathEffect.cpp"

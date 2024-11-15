@@ -11,7 +11,6 @@ add_executable(PathKitDemo
     unity_pathkit_misc.cpp
     unity_pathkit_pathops1.cpp
     unity_pathkit_pathops2.cpp
-    
     )
 target_compile_options(PathKitDemo PRIVATE
     -Wno-unused-function
