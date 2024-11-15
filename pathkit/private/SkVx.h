@@ -27,7 +27,7 @@
 #include <utility>           // std::index_sequence
 
 #if defined(__SSE__) || defined(__AVX__) || defined(__AVX2__)
-    #include <immintrin.h>
+    #include <emmintrin.h>
 #elif defined(__ARM_NEON)
     #include <arm_neon.h>
 #elif defined(__wasm_simd128__)
