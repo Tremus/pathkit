@@ -18,6 +18,14 @@ struct SkRect;
 #define TRIANGULATOR_LOGGING 0
 #define TRIANGULATOR_WIREFRAME 0
 
+#if TRIANGULATOR_LOGGING
+#define TESS_LOG printf
+#define DUMP_MESH(M) (M).dump()
+#else
+#define TESS_LOG(...)
+#define DUMP_MESH(M)
+#endif
+
 /**
  * Provides utility functions for converting paths to a collection of triangles.
  */

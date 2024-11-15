@@ -11,14 +11,6 @@
 #include <unordered_map>
 #include <vector>
 
-#if TRIANGULATOR_LOGGING
-#define TESS_LOG SkDebugf
-#define DUMP_MESH(MESH) (MESH).dump()
-#else
-#define TESS_LOG(...)
-#define DUMP_MESH(MESH)
-#endif
-
 namespace pk {
 constexpr static float kCosMiterAngle = 0.97f;  // Corresponds to an angle of ~14 degrees.
 

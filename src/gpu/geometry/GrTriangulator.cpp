@@ -15,14 +15,6 @@
 
 #include <algorithm>
 
-#if TRIANGULATOR_LOGGING
-#define TESS_LOG printf
-#define DUMP_MESH(M) (M).dump()
-#else
-#define TESS_LOG(...)
-#define DUMP_MESH(M)
-#endif
-
 namespace pk {
 using EdgeType = GrTriangulator::EdgeType;
 using Vertex = GrTriangulator::Vertex;
