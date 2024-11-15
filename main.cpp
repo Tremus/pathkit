@@ -1,8 +1,8 @@
-#include "src/core/SkPaint.h"
-#include "src/core/SkPath.h"
-#include "src/core/SkStrokeRec.h"
-#include "src/effects/SkDashPathEffect.h"
-#include "src/pathops/SkPathOps.h"
+#include "pathkit/core/SkPaint.h"
+#include "pathkit/core/SkPath.h"
+#include "pathkit/core/SkStrokeRec.h"
+#include "pathkit/effects/SkDashPathEffect.h"
+#include "pathkit/pathops/SkPathOps.h"
 
 using namespace pk;
 
