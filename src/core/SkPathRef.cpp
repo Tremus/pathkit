@@ -5,21 +5,18 @@
  * found in the LICENSE file.
  */
 
-#include "include/private/SkPathRef.h"
+#include "src/private/SkPathRef.h"
 
-#include "include/core/SkPath.h"
-#include "include/private/SkNx.h"
-#include "include/private/SkOnce.h"
-#include "include/private/SkTo.h"
+#include "src/core/SkPath.h"
 #include "src/core/SkPathPriv.h"
 #include "src/core/SkSafeMath.h"
+#include "src/private/SkNx.h"
+#include "src/private/SkOnce.h"
+#include "src/private/SkTo.h"
 
 namespace pk {
 //////////////////////////////////////////////////////////////////////////////
-SkPathRef::Editor::Editor(sk_sp<SkPathRef>* pathRef,
-                          int incReserveVerbs,
-                          int incReservePoints)
-{
+SkPathRef::Editor::Editor(sk_sp<SkPathRef>* pathRef, int incReserveVerbs, int incReservePoints) {
     if ((*pathRef)->unique()) {
         (*pathRef)->incReserve(incReserveVerbs, incReservePoints);
     } else {
@@ -38,14 +35,16 @@ static SkPathRef* gEmpty = nullptr;
 
 SkPathRef* SkPathRef::CreateEmpty() {
     static SkOnce once;
-    once([]{
+    once([] {
         gEmpty = new SkPathRef;
-        gEmpty->computeBounds();   // Avoids races later to be the first to do this.
+        gEmpty->computeBounds();  // Avoids races later to be the first to do this.
     });
     return SkRef(gEmpty);
 }
 
-static void transform_dir_and_start(const SkMatrix& matrix, bool isRRect, bool* isCCW,
+static void transform_dir_and_start(const SkMatrix& matrix,
+                                    bool isRRect,
+                                    bool* isCCW,
                                     unsigned* start) {
     int inStart = *start;
     int rm = 0;
@@ -193,7 +192,7 @@ void SkPathRef::Rewind(sk_sp<SkPathRef>* pathRef) {
     }
 }
 
-bool SkPathRef::operator== (const SkPathRef& ref) const {
+bool SkPathRef::operator==(const SkPathRef& ref) const {
     // We explicitly check fSegmentMask as a quick-reject. We could skip it,
     // since it is only a cache of info in the fVerbs, but its a fast way to
     // notice a difference
@@ -216,8 +215,11 @@ bool SkPathRef::operator== (const SkPathRef& ref) const {
 void SkPathRef::copy(const SkPathRef& ref,
                      int additionalReserveVerbs,
                      int additionalReservePoints) {
-    this->resetToSize(ref.fVerbs.count(), ref.fPoints.count(), ref.fConicWeights.count(),
-                      additionalReserveVerbs, additionalReservePoints);
+    this->resetToSize(ref.fVerbs.count(),
+                      ref.fPoints.count(),
+                      ref.fConicWeights.count(),
+                      additionalReserveVerbs,
+                      additionalReservePoints);
     fVerbs = ref.fVerbs;
     fPoints = ref.fPoints;
     fConicWeights = ref.fConicWeights;
@@ -268,9 +270,7 @@ std::tuple<SkPoint*, SkScalar*> SkPathRef::growForVerbsInPath(const SkPathRef& p
     return {pts, weights};
 }
 
-SkPoint* SkPathRef::growForRepeatedVerb(int /*SkPath::Verb*/ verb,
-                                        int numVbs,
-                                        SkScalar** weights) {
+SkPoint* SkPathRef::growForRepeatedVerb(int /*SkPath::Verb*/ verb, int numVbs, SkScalar** weights) {
     int pCnt;
     switch (verb) {
         case SkPath::kMove_Verb:
@@ -390,18 +390,17 @@ SkRRect SkPathRef::getRRect() const {
                 PkASSERT(!v2_1.fY);
                 dxdy.set(PkScalarAbs(v2_1.fX), PkScalarAbs(v1_0.fY));
             }
-            SkRRect::Corner corner =
-                    pts[1].fX == bounds.fLeft ?
-                        pts[1].fY == bounds.fTop ?
-                            SkRRect::kUpperLeft_Corner : SkRRect::kLowerLeft_Corner :
-                    pts[1].fY == bounds.fTop ?
-                            SkRRect::kUpperRight_Corner : SkRRect::kLowerRight_Corner;
+            SkRRect::Corner corner = pts[1].fX == bounds.fLeft
+                                             ? pts[1].fY == bounds.fTop ? SkRRect::kUpperLeft_Corner
+                                                                        : SkRRect::kLowerLeft_Corner
+                                     : pts[1].fY == bounds.fTop ? SkRRect::kUpperRight_Corner
+                                                                : SkRRect::kLowerRight_Corner;
             PkASSERT(!radii[corner].fX && !radii[corner].fY);
             radii[corner] = dxdy;
         } else {
-            PkASSERT((verb == SkPath::kLine_Verb
-                    && (!(pts[1].fX - pts[0].fX) || !(pts[1].fY - pts[0].fY)))
-                    || verb == SkPath::kClose_Verb);
+            PkASSERT((verb == SkPath::kLine_Verb &&
+                      (!(pts[1].fX - pts[0].fX) || !(pts[1].fY - pts[0].fY))) ||
+                     verb == SkPath::kClose_Verb);
         }
     }
     SkRRect rrect;
@@ -415,9 +414,7 @@ SkPathRef::Iter::Iter() {
     fVerbStop = nullptr;
 }
 
-SkPathRef::Iter::Iter(const SkPathRef& path) {
-    this->setPathRef(path);
-}
+SkPathRef::Iter::Iter(const SkPathRef& path) { this->setPathRef(path); }
 
 void SkPathRef::Iter::setPathRef(const SkPathRef& path) {
     fPts = path.points();
@@ -436,7 +433,7 @@ void SkPathRef::Iter::setPathRef(const SkPathRef& path) {
 
 uint8_t SkPathRef::Iter::next(SkPoint pts[4]) {
     if (fVerbs == fVerbStop) {
-        return (uint8_t) SkPath::kDone_Verb;
+        return (uint8_t)SkPath::kDone_Verb;
     }
 
     // fVerbs points one beyond next verb so decrement first.
@@ -475,11 +472,11 @@ uint8_t SkPathRef::Iter::next(SkPoint pts[4]) {
             break;
     }
     fPts = srcPts;
-    return (uint8_t) verb;
+    return (uint8_t)verb;
 }
 
 uint8_t SkPathRef::Iter::peek() const {
-    return fVerbs < fVerbStop ? *fVerbs : (uint8_t) SkPath::kDone_Verb;
+    return fVerbs < fVerbStop ? *fVerbs : (uint8_t)SkPath::kDone_Verb;
 }
 
 SkPathEdgeIter::SkPathEdgeIter(const SkPath& path) {

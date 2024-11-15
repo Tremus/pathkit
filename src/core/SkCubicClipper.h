@@ -5,11 +5,10 @@
  * found in the LICENSE file.
  */
 
-
 #pragma once
 
-#include "include/core/SkPoint.h"
-#include "include/core/SkRect.h"
+#include "src/core/SkPoint.h"
+#include "src/core/SkRect.h"
 
 namespace pk {
 /** This class is initialized with a clip rectangle, and then can be fed cubics,
@@ -21,6 +20,7 @@ namespace pk {
 class SkCubicClipper {
 public:
     static bool PK_WARN_UNUSED_RESULT ChopMonoAtY(const SkPoint pts[4], SkScalar y, SkScalar* t);
+
 private:
     // SkRect      fClip;
 };

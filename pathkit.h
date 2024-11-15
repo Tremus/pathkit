@@ -7,13 +7,13 @@
 #pragma clang diagnostic ignored "-Wc++14-binary-literal"
 #endif
 
-#include "include/effects/SkCornerPathEffect.h"
-#include "include/effects/SkDashPathEffect.h"
-#include "include/core/SkPaint.h"
-#include "include/core/SkPath.h"
-#include "include/core/SkPathMeasure.h"
-#include "include/pathops/SkPathOps.h"
-#include "include/core/SkStrokeRec.h"
+#include "src/core/SkPaint.h"
+#include "src/core/SkPath.h"
+#include "src/core/SkPathMeasure.h"
+#include "src/core/SkStrokeRec.h"
+#include "src/effects/SkCornerPathEffect.h"
+#include "src/effects/SkDashPathEffect.h"
+#include "src/pathops/SkPathOps.h"
 
 #ifndef _MSC_VER
 #pragma clang diagnostic pop

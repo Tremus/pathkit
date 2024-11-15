@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "include/core/SkPathBuilder.h"
+#include "src/core/SkPathBuilder.h"
 
 namespace pk {
 static_assert(0 == static_cast<int>(SkPathFillType::kWinding), "fill_type_mismatch");
@@ -18,7 +18,7 @@ static_assert(3 == static_cast<int>(SkPathFillType::kInverseEvenOdd), "fill_type
 class SkPathPriv {
 public:
 #ifdef PK_BUILD_FOR_ANDROID_FRAMEWORK
-    static const int kPathRefGenIDBitCnt = 30; // leave room for the fill type (skbug.com/1762)
+    static const int kPathRefGenIDBitCnt = 30;  // leave room for the fill type (skbug.com/1762)
 #else
     static const int kPathRefGenIDBitCnt = 32;
 #endif
@@ -28,7 +28,9 @@ public:
      */
     static SkPathFirstDirection OppositeFirstDirection(SkPathFirstDirection dir) {
         static const SkPathFirstDirection gOppositeDir[] = {
-            SkPathFirstDirection::kCCW, SkPathFirstDirection::kCW, SkPathFirstDirection::kUnknown,
+                SkPathFirstDirection::kCCW,
+                SkPathFirstDirection::kCW,
+                SkPathFirstDirection::kUnknown,
         };
         return gOppositeDir[(unsigned)dir];
     }
@@ -52,15 +54,15 @@ public:
                 return i;
             }
         }
-        return verbCount; // path is all move verbs
+        return verbCount;  // path is all move verbs
     }
 
     /**
-      * Iterates through a raw range of path verbs, points, and conics. All values are returned
-      * unaltered.
-      *
-      * NOTE: This class's definition will be moved into SkPathPriv once RangeIter is removed.
-    */
+     * Iterates through a raw range of path verbs, points, and conics. All values are returned
+     * unaltered.
+     *
+     * NOTE: This class's definition will be moved into SkPathPriv once RangeIter is removed.
+     */
     using RangeIter = SkPath::RangeIter;
 
     /**
@@ -77,14 +79,19 @@ public:
                           // Don't allow iteration through non-finite points.
                           (!path.isFinite()) ? path.fPathRef->verbsBegin()
                                              : path.fPathRef->verbsEnd(),
-                          path.fPathRef->points(), path.fPathRef->conicWeights()) {
-        }
-        Iterate(const uint8_t* verbsBegin, const uint8_t* verbsEnd, const SkPoint* points,
+                          path.fPathRef->points(),
+                          path.fPathRef->conicWeights()) {}
+        Iterate(const uint8_t* verbsBegin,
+                const uint8_t* verbsEnd,
+                const SkPoint* points,
                 const SkScalar* weights)
-                : fVerbsBegin(verbsBegin), fVerbsEnd(verbsEnd), fPoints(points), fWeights(weights) {
-        }
+                : fVerbsBegin(verbsBegin)
+                , fVerbsEnd(verbsEnd)
+                , fPoints(points)
+                , fWeights(weights) {}
         SkPath::RangeIter begin() { return {fVerbsBegin, fPoints, fWeights}; }
         SkPath::RangeIter end() { return {fVerbsEnd, nullptr, nullptr}; }
+
     private:
         const uint8_t* fVerbsBegin;
         const uint8_t* fVerbsEnd;
@@ -137,8 +144,7 @@ public:
      @param start  storage for start of SkRRect; may be nullptr
      @return       true if SkPath contains only SkRRect
      */
-    static bool IsRRect(const SkPath& path, SkRRect* rrect, SkPathDirection* dir,
-                        unsigned* start) {
+    static bool IsRRect(const SkPath& path, SkRRect* rrect, SkPathDirection* dir, unsigned* start) {
         bool isCCW = false;
         bool result = path.fPathRef->isRRect(rrect, &isCCW, start);
         if (dir && result) {
@@ -151,13 +157,13 @@ public:
     // point that the Iterator adds for line/quad/conic/cubic
     static int PtsInVerb(unsigned verb) {
         static const uint8_t gPtsInVerb[] = {
-            1,  // kMove    pts[0]
-            1,  // kLine    pts[0..1]
-            2,  // kQuad    pts[0..2]
-            2,  // kConic   pts[0..2]
-            3,  // kCubic   pts[0..3]
-            0,  // kClose
-            0   // kDone
+                1,  // kMove    pts[0]
+                1,  // kLine    pts[0..1]
+                2,  // kQuad    pts[0..2]
+                2,  // kConic   pts[0..2]
+                3,  // kCubic   pts[0..3]
+                0,  // kClose
+                0   // kDone
         };
 
         return gPtsInVerb[verb];
@@ -174,12 +180,14 @@ public:
         return true;
     }
 
-    static bool IsRectContour(const SkPath&, bool allowPartial, int* currVerb,
-                              const SkPoint** ptsPtr, bool* isClosed, SkPathDirection* direction,
+    static bool IsRectContour(const SkPath&,
+                              bool allowPartial,
+                              int* currVerb,
+                              const SkPoint** ptsPtr,
+                              bool* isClosed,
+                              SkPathDirection* direction,
                               SkRect* rect);
-    static void SetConvexity(const SkPath& path, SkPathConvexity c) {
-        path.setConvexity(c);
-    }
+    static void SetConvexity(const SkPath& path, SkPathConvexity c) { path.setConvexity(c); }
     static void SetConvexity(SkPathBuilder* builder, SkPathConvexity c) {
         builder->privateSetConvexity(c);
     }
@@ -194,41 +202,35 @@ public:
 // Roughly the same as SkPath::Iter(path, true), but does not return moves or closes
 //
 class SkPathEdgeIter {
-    const uint8_t*  fVerbs;
-    const uint8_t*  fVerbsStop;
-    const SkPoint*  fPts;
-    const SkPoint*  fMoveToPtr;
+    const uint8_t* fVerbs;
+    const uint8_t* fVerbsStop;
+    const SkPoint* fPts;
+    const SkPoint* fMoveToPtr;
     const SkScalar* fConicWeights;
-    SkPoint         fScratch[2];    // for auto-close lines
-    bool            fNeedsCloseLine;
-    bool            fNextIsNewContour;
+    SkPoint fScratch[2];  // for auto-close lines
+    bool fNeedsCloseLine;
+    bool fNextIsNewContour;
 
-    enum {
-        kIllegalEdgeValue = 99
-    };
+    enum { kIllegalEdgeValue = 99 };
 
 public:
     SkPathEdgeIter(const SkPath& path);
 
-    SkScalar conicWeight() const {
-        return *fConicWeights;
-    }
+    SkScalar conicWeight() const { return *fConicWeights; }
 
     enum class Edge {
-        kLine  = SkPath::kLine_Verb,
-        kQuad  = SkPath::kQuad_Verb,
+        kLine = SkPath::kLine_Verb,
+        kQuad = SkPath::kQuad_Verb,
         kConic = SkPath::kConic_Verb,
         kCubic = SkPath::kCubic_Verb,
     };
 
-    static SkPath::Verb EdgeToVerb(Edge e) {
-        return SkPath::Verb(e);
-    }
+    static SkPath::Verb EdgeToVerb(Edge e) { return SkPath::Verb(e); }
 
     struct Result {
-        const SkPoint*  fPts;   // points for the segment, or null if done
-        Edge            fEdge;
-        bool            fIsNewContour;
+        const SkPoint* fPts;  // points for the segment, or null if done
+        Edge fEdge;
+        bool fIsNewContour;
 
         // Returns true when it holds an Edge, false when the path is done.
         operator bool() { return fPts != nullptr; }
@@ -240,14 +242,13 @@ public:
             fScratch[1] = *fMoveToPtr;
             fNeedsCloseLine = false;
             fNextIsNewContour = true;
-            return Result{ fScratch, Edge::kLine, false };
+            return Result{fScratch, Edge::kLine, false};
         };
 
         for (;;) {
             if (fVerbs == fVerbsStop) {
-                return fNeedsCloseLine
-                    ? closeline()
-                    : Result{ nullptr, Edge(kIllegalEdgeValue), false };
+                return fNeedsCloseLine ? closeline()
+                                       : Result{nullptr, Edge(kIllegalEdgeValue), false};
             }
 
             const auto v = *fVerbs++;
@@ -266,15 +267,14 @@ public:
                     break;
                 default: {
                     // Actual edge.
-                    const int pts_count = (v+2) / 2,
-                              cws_count = (v & (v-1)) / 2;
+                    const int pts_count = (v + 2) / 2, cws_count = (v & (v - 1)) / 2;
                     fNeedsCloseLine = true;
-                    fPts           += pts_count;
-                    fConicWeights  += cws_count;
+                    fPts += pts_count;
+                    fConicWeights += cws_count;
 
                     bool isNewContour = fNextIsNewContour;
                     fNextIsNewContour = false;
-                    return { &fPts[-(pts_count + 1)], Edge(v), isNewContour };
+                    return {&fPts[-(pts_count + 1)], Edge(v), isNewContour};
                 }
             }
         }

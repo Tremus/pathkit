@@ -5,7 +5,7 @@
  * found in the LICENSE file.
  */
 
-#include "include/core/SkTypes.h"
+#include "src/core/SkTypes.h"
 
 #include <stdarg.h>
 #include <stdio.h>

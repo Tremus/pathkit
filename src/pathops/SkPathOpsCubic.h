@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "include/core/SkPath.h"
 #include "src/core/SkArenaAlloc.h"
+#include "src/core/SkPath.h"
 #include "src/pathops/SkPathOpsTCurve.h"
 
 namespace pk {
@@ -19,14 +19,11 @@ struct SkDCubic {
     static const int kPointLast = kPointCount - 1;
     static const int kMaxIntersections = 9;
 
-    enum SearchAxis {
-        kXAxis,
-        kYAxis
-    };
+    enum SearchAxis { kXAxis, kYAxis };
 
     bool collapsed() const {
-        return fPts[0].approximatelyEqual(fPts[1]) && fPts[0].approximatelyEqual(fPts[2])
-                && fPts[0].approximatelyEqual(fPts[3]);
+        return fPts[0].approximatelyEqual(fPts[1]) && fPts[0].approximatelyEqual(fPts[2]) &&
+               fPts[0].approximatelyEqual(fPts[3]);
     }
 
     bool controlsInside() const {
@@ -40,8 +37,14 @@ struct SkDCubic {
 
     static bool IsConic() { return false; }
 
-    const SkDPoint& operator[](int n) const { PkASSERT(n >= 0 && n < kPointCount); return fPts[n]; }
-    SkDPoint& operator[](int n) { PkASSERT(n >= 0 && n < kPointCount); return fPts[n]; }
+    const SkDPoint& operator[](int n) const {
+        PkASSERT(n >= 0 && n < kPointCount);
+        return fPts[n];
+    }
+    SkDPoint& operator[](int n) {
+        PkASSERT(n >= 0 && n < kPointCount);
+        return fPts[n];
+    }
 
     void align(int endIndex, int ctrlIndex, SkDPoint* dstPt) const;
     double binarySearch(double min, double max, double axisIntercept, SearchAxis xAxis) const;
@@ -51,9 +54,7 @@ struct SkDCubic {
     static int ComplexBreak(const SkPoint pts[4], SkScalar* t);
     int convexHull(char order[kPointCount]) const;
 
-    void debugInit() {
-        sk_bzero(fPts, sizeof(fPts));
-    }
+    void debugInit() { sk_bzero(fPts, sizeof(fPts)); }
 
     void debugSet(const SkDPoint* pts);
 
@@ -91,10 +92,13 @@ struct SkDCubic {
     static int RootsReal(double A, double B, double C, double D, double t[3]);
     static int RootsValidT(const double A, const double B, const double C, double D, double s[3]);
 
-    int searchRoots(double extremes[6], int extrema, double axisIntercept,
-                    SearchAxis xAxis, double* validRoots) const;
+    int searchRoots(double extremes[6],
+                    int extrema,
+                    double axisIntercept,
+                    SearchAxis xAxis,
+                    double* validRoots) const;
 
-    bool toFloatPoints(SkPoint* ) const;
+    bool toFloatPoints(SkPoint*) const;
     /**
      *  Return the number of valid roots (0 < root < 1) for this cubic intersecting the
      *  specified horizontal line.
@@ -106,9 +110,9 @@ struct SkDCubic {
      */
     int verticalIntersect(double xIntercept, double roots[3]) const;
 
-// add debug only global pointer so asserts can be skipped by fuzzers
-    const SkDCubic& set(const SkPoint pts[kPointCount]
-            PkDEBUGPARAMS(SkOpGlobalState* state = nullptr)) {
+    // add debug only global pointer so asserts can be skipped by fuzzers
+    const SkDCubic& set(
+            const SkPoint pts[kPointCount] PkDEBUGPARAMS(SkOpGlobalState* state = nullptr)) {
         fPts[0] = pts[0];
         fPts[1] = pts[1];
         fPts[2] = pts[2];
@@ -127,13 +131,17 @@ struct SkDCubic {
 
     void subDivide(const SkDPoint& a, const SkDPoint& d, double t1, double t2, SkDPoint p[2]) const;
 
-    static void SubDivide(const SkPoint pts[kPointCount], const SkDPoint& a, const SkDPoint& d, double t1,
-                          double t2, SkDPoint p[2]) {
+    static void SubDivide(const SkPoint pts[kPointCount],
+                          const SkDPoint& a,
+                          const SkDPoint& d,
+                          double t1,
+                          double t2,
+                          SkDPoint p[2]) {
         SkDCubic cubic;
         cubic.set(pts).subDivide(a, d, t1, t2, p);
     }
 
-    double top(const SkDCubic& dCurve, double startT, double endT, SkDPoint*topPt) const;
+    double top(const SkDCubic& dCurve, double startT, double endT, SkDPoint* topPt) const;
     SkDQuad toQuad() const;
 
     static const int gPrecisionUnit;
@@ -155,9 +163,7 @@ given that:
    (0, 3) ^ 2 -> (2, 1)  (1, 2) ^ 2 -> (3, 0)
    (0, 1) ^ 3 -> (3, 2)  (0, 2) ^ 3 -> (3, 1)  (1, 3) ^ 3 -> (2, 0)  (2, 3) ^ 3 -> (1, 0)
 */
-inline int other_two(int one, int two) {
-    return 1 >> (3 - (one ^ two)) ^ 3;
-}
+inline int other_two(int one, int two) { return 1 >> (3 - (one ^ two)) ^ 3; }
 
 struct SkDCubicPair {
     SkDCubic first() const {
@@ -166,7 +172,7 @@ struct SkDCubicPair {
         result.debugSet(&pts[0]);
         return result;
 #else
-        return (const SkDCubic&) pts[0];
+        return (const SkDCubic&)pts[0];
 #endif
     }
     SkDCubic second() const {
@@ -175,7 +181,7 @@ struct SkDCubicPair {
         result.debugSet(&pts[3]);
         return result;
 #else
-        return (const SkDCubic&) pts[3];
+        return (const SkDCubic&)pts[3];
 #endif
     }
     SkDPoint pts[7];
@@ -187,9 +193,7 @@ public:
 
     SkTCubic() {}
 
-    SkTCubic(const SkDCubic& c)
-        : fCubic(c) {
-    }
+    SkTCubic(const SkDCubic& c) : fCubic(c) {}
 
     ~SkTCubic() override {}
 
@@ -230,10 +234,10 @@ public:
     int pointCount() const override { return SkDCubic::kPointCount; }
     int pointLast() const override { return SkDCubic::kPointLast; }
     SkDPoint ptAtT(double t) const override { return fCubic.ptAtT(t); }
-    void setBounds(SkDRect* ) const override;
+    void setBounds(SkDRect*) const override;
 
     void subDivide(double t1, double t2, SkTCurve* curve) const override {
-        ((SkTCubic*) curve)->fCubic = fCubic.subDivide(t1, t2);
+        ((SkTCubic*)curve)->fCubic = fCubic.subDivide(t1, t2);
     }
 };
 }  // namespace pk

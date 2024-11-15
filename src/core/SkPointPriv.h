@@ -7,16 +7,16 @@
 
 #pragma once
 
-#include "include/core/SkPoint.h"
-#include "include/core/SkRect.h"
+#include "src/core/SkPoint.h"
+#include "src/core/SkRect.h"
 
 namespace pk {
 class SkPointPriv {
 public:
     enum Side {
-        kLeft_Side  = -1,
-        kOn_Side    =  0,
-        kRight_Side =  1,
+        kLeft_Side = -1,
+        kOn_Side = 0,
+        kRight_Side = 1,
     };
 
     static bool AreFinite(const SkPoint array[], int count) {
@@ -29,18 +29,24 @@ public:
         return SkScalarsAreFinite(dx, dy) && (dx || dy);
     }
 
-    static SkScalar DistanceToLineBetweenSqd(const SkPoint& pt, const SkPoint& a,
-                                             const SkPoint& b, Side* side = nullptr);
+    static SkScalar DistanceToLineBetweenSqd(const SkPoint& pt,
+                                             const SkPoint& a,
+                                             const SkPoint& b,
+                                             Side* side = nullptr);
 
-    static SkScalar DistanceToLineBetween(const SkPoint& pt, const SkPoint& a,
-                                          const SkPoint& b, Side* side = nullptr) {
+    static SkScalar DistanceToLineBetween(const SkPoint& pt,
+                                          const SkPoint& a,
+                                          const SkPoint& b,
+                                          Side* side = nullptr) {
         return PkScalarSqrt(DistanceToLineBetweenSqd(pt, a, b, side));
     }
 
-    static SkScalar DistanceToLineSegmentBetweenSqd(const SkPoint& pt, const SkPoint& a,
-                                                   const SkPoint& b);
+    static SkScalar DistanceToLineSegmentBetweenSqd(const SkPoint& pt,
+                                                    const SkPoint& a,
+                                                    const SkPoint& b);
 
-    static SkScalar DistanceToLineSegmentBetween(const SkPoint& pt, const SkPoint& a,
+    static SkScalar DistanceToLineSegmentBetween(const SkPoint& pt,
+                                                 const SkPoint& a,
                                                  const SkPoint& b) {
         return PkScalarSqrt(DistanceToLineSegmentBetweenSqd(pt, a, b));
     }
@@ -56,13 +62,10 @@ public:
     }
 
     static bool EqualsWithinTolerance(const SkPoint& pt, const SkPoint& p, SkScalar tol) {
-        return SkScalarNearlyZero(pt.fX - p.fX, tol)
-               && SkScalarNearlyZero(pt.fY - p.fY, tol);
+        return SkScalarNearlyZero(pt.fX - p.fX, tol) && SkScalarNearlyZero(pt.fY - p.fY, tol);
     }
 
-    static SkScalar LengthSqd(const SkPoint& pt) {
-        return SkPoint::DotProduct(pt, pt);
-    }
+    static SkScalar LengthSqd(const SkPoint& pt) { return SkPoint::DotProduct(pt, pt); }
 
     static void Negate(SkIPoint& pt) {
         pt.fX = -pt.fX;
@@ -76,9 +79,7 @@ public:
         dst->fY = -tmp;
     }
 
-    static void RotateCCW(SkPoint* pt) {
-        RotateCCW(*pt, pt);
-    }
+    static void RotateCCW(SkPoint* pt) { RotateCCW(*pt, pt); }
 
     static void RotateCW(const SkPoint& src, SkPoint* dst) {
         // use a tmp in case src == dst
@@ -87,9 +88,7 @@ public:
         dst->fY = tmp;
     }
 
-    static void RotateCW(SkPoint* pt) {
-        RotateCW(*pt, pt);
-    }
+    static void RotateCW(SkPoint* pt) { RotateCW(*pt, pt); }
 
     static bool SetLengthFast(SkPoint* pt, float length);
 
@@ -98,8 +97,8 @@ public:
     }
 
     // counter-clockwise fan
-    static void SetRectFan(SkPoint v[], SkScalar l, SkScalar t, SkScalar r, SkScalar b,
-            size_t stride) {
+    static void SetRectFan(
+            SkPoint v[], SkScalar l, SkScalar t, SkScalar r, SkScalar b, size_t stride) {
         ((SkPoint*)((intptr_t)v + 0 * stride))->set(l, t);
         ((SkPoint*)((intptr_t)v + 1 * stride))->set(l, b);
         ((SkPoint*)((intptr_t)v + 2 * stride))->set(r, b);
@@ -107,8 +106,8 @@ public:
     }
 
     // tri strip with two counter-clockwise triangles
-    static void SetRectTriStrip(SkPoint v[], SkScalar l, SkScalar t, SkScalar r, SkScalar b,
-            size_t stride) {
+    static void SetRectTriStrip(
+            SkPoint v[], SkScalar l, SkScalar t, SkScalar r, SkScalar b, size_t stride) {
         ((SkPoint*)((intptr_t)v + 0 * stride))->set(l, t);
         ((SkPoint*)((intptr_t)v + 1 * stride))->set(l, b);
         ((SkPoint*)((intptr_t)v + 2 * stride))->set(r, t);

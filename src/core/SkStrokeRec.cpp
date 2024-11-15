@@ -5,7 +5,7 @@
  * found in the LICENSE file.
  */
 
-#include "include/core/SkStrokeRec.h"
+#include "src/core/SkStrokeRec.h"
 #include "src/core/SkPaintDefaults.h"
 #include "src/core/SkStroke.h"
 

@@ -8,9 +8,8 @@
 #pragma once
 
 #include <limits>
-#include "include/core/SkTypes.h"
-#include "include/private/SkTFitsIn.h"
-
+#include "src/core/SkTypes.h"
+#include "src/private/SkTFitsIn.h"
 
 namespace pk {
 // SkSafeMath always check that a series of operations do not overflow.
@@ -48,9 +47,7 @@ public:
         return a + b;
     }
 
-    size_t alignUp(size_t x, size_t alignment) {
-        return add(x, alignment - 1) & ~(alignment - 1);
-    }
+    size_t alignUp(size_t x, size_t alignment) { return add(x, alignment - 1) & ~(alignment - 1); }
 
     template <typename T> T castTo(size_t value) {
         if (!SkTFitsIn<T>(value)) {
@@ -77,8 +74,8 @@ private:
     }
 
     uint64_t mul64(uint64_t x, uint64_t y) {
-        if (x <= std::numeric_limits<uint64_t>::max() >> 32
-            && y <= std::numeric_limits<uint64_t>::max() >> 32) {
+        if (x <= std::numeric_limits<uint64_t>::max() >> 32 &&
+            y <= std::numeric_limits<uint64_t>::max() >> 32) {
             return x * y;
         } else {
             auto hi = [](uint64_t x) { return x >> 32; };

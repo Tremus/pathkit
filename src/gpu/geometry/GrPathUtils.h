@@ -8,7 +8,7 @@
 #ifndef GrPathUtils_DEFINED
 #define GrPathUtils_DEFINED
 
-#include "include/core/SkPoint.h"
+#include "src/core/SkPoint.h"
 
 namespace pk {
 /**

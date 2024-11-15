@@ -9,9 +9,9 @@
 
 #include "src/gpu/geometry/GrPathUtils.h"
 
-#include "include/private/SkTPin.h"
 #include "src/core/SkGeometry.h"
 #include "src/core/SkPointPriv.h"
+#include "src/private/SkTPin.h"
 
 #include <algorithm>
 

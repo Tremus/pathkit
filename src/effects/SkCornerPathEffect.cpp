@@ -5,15 +5,13 @@
  * found in the LICENSE file.
  */
 
-
-#include "include/core/SkPath.h"
-#include "include/core/SkPoint.h"
-#include "include/effects/SkCornerPathEffect.h"
+#include "src/effects/SkCornerPathEffect.h"
+#include "src/core/SkPath.h"
 #include "src/core/SkPathEffectBase.h"
+#include "src/core/SkPoint.h"
 
 namespace pk {
-static bool ComputeStep(const SkPoint& a, const SkPoint& b, SkScalar radius,
-                        SkPoint* step) {
+static bool ComputeStep(const SkPoint& a, const SkPoint& b, SkScalar radius, SkPoint* step) {
     SkScalar dist = SkPoint::Distance(a, b);
 
     *step = b - a;
@@ -28,23 +26,25 @@ static bool ComputeStep(const SkPoint& a, const SkPoint& b, SkScalar radius,
 
 class SkCornerPathEffectImpl : public SkPathEffectBase {
 public:
-    explicit SkCornerPathEffectImpl(SkScalar radius) : fRadius(radius) {
-    }
+    explicit SkCornerPathEffectImpl(SkScalar radius) : fRadius(radius) {}
 
-    bool onFilterPath(SkPath* dst, const SkPath& src, SkStrokeRec*, const SkRect*,
+    bool onFilterPath(SkPath* dst,
+                      const SkPath& src,
+                      SkStrokeRec*,
+                      const SkRect*,
                       const SkMatrix&) const override {
         if (fRadius <= 0) {
             return false;
         }
 
-        SkPath::Iter    iter(src, false);
-        SkPath::Verb    verb, prevVerb = SkPath::kDone_Verb;
-        SkPoint         pts[4];
+        SkPath::Iter iter(src, false);
+        SkPath::Verb verb, prevVerb = SkPath::kDone_Verb;
+        SkPoint pts[4];
 
-        bool        closed;
-        SkPoint     moveTo, lastCorner;
-        SkVector    firstStep, step;
-        bool        prevIsValid = true;
+        bool closed;
+        SkPoint moveTo, lastCorner;
+        SkVector firstStep, step;
+        bool prevIsValid = true;
 
         // to avoid warnings
         step.set(0, 0);
@@ -75,8 +75,7 @@ public:
                         dst->moveTo(moveTo + step);
                         prevIsValid = true;
                     } else {
-                        dst->quadTo(pts[0].fX, pts[0].fY, pts[0].fX + step.fX,
-                                    pts[0].fY + step.fY);
+                        dst->quadTo(pts[0].fX, pts[0].fY, pts[0].fX + step.fX, pts[0].fY + step.fY);
                     }
                     if (drawSegment) {
                         dst->lineTo(pts[1].fX - step.fX, pts[1].fY - step.fY);
@@ -117,7 +116,8 @@ public:
                     break;
                 case SkPath::kClose_Verb:
                     if (firstStep.fX || firstStep.fY) {
-                        dst->quadTo(lastCorner.fX, lastCorner.fY,
+                        dst->quadTo(lastCorner.fX,
+                                    lastCorner.fY,
                                     lastCorner.fX + firstStep.fX,
                                     lastCorner.fY + firstStep.fY);
                     }
@@ -157,7 +157,8 @@ private:
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 sk_sp<SkPathEffect> SkCornerPathEffect::Make(SkScalar radius) {
-    return SkScalarIsFinite(radius) && (radius > 0) ?
-            sk_sp<SkPathEffect>(new SkCornerPathEffectImpl(radius)) : nullptr;
+    return SkScalarIsFinite(radius) && (radius > 0)
+                   ? sk_sp<SkPathEffect>(new SkCornerPathEffectImpl(radius))
+                   : nullptr;
 }
 }  // namespace pk

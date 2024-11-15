@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "include/core/SkPaint.h"
+#include "src/core/SkPaint.h"
 
 namespace pk {
 class SkPaintPriv {

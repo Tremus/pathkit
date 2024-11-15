@@ -7,14 +7,12 @@
 
 #pragma once
 
-#include "include/core/SkRect.h"
 #include "src/core/SkMathPriv.h"
+#include "src/core/SkRect.h"
 
 namespace pk {
 class SkRectPriv {
 public:
-
-
     // Returns r.width()/2 but divides first to avoid width() overflowing.
     static SkScalar HalfWidth(const SkRect& r) {
         return PkScalarHalf(r.fRight) - PkScalarHalf(r.fLeft);

@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "include/core/SkTypes.h"
 #include <new>
 #include <type_traits>
 #include <utility>
+#include "src/core/SkTypes.h"
 
 namespace pk {
 /**
@@ -20,9 +20,9 @@ namespace pk {
 template <typename T> class SkTLazy {
 public:
     SkTLazy() = default;
-    explicit SkTLazy(const T* src) : fPtr(src ? new (&fStorage) T(*src) : nullptr) {}
-    SkTLazy(const SkTLazy& that) : fPtr(that.fPtr ? new (&fStorage) T(*that.fPtr) : nullptr) {}
-    SkTLazy(SkTLazy&& that) : fPtr(that.fPtr ? new (&fStorage) T(std::move(*that.fPtr)) : nullptr){}
+    explicit SkTLazy(const T* src) : fPtr(src ? new(&fStorage) T(*src) : nullptr) {}
+    SkTLazy(const SkTLazy& that) : fPtr(that.fPtr ? new(&fStorage) T(*that.fPtr) : nullptr) {}
+    SkTLazy(SkTLazy&& that) : fPtr(that.fPtr ? new(&fStorage) T(std::move(*that.fPtr)) : nullptr) {}
 
     ~SkTLazy() { this->reset(); }
 
@@ -112,7 +112,7 @@ public:
 
 private:
     alignas(T) char fStorage[sizeof(T)];
-    T*              fPtr{nullptr}; // nullptr or fStorage
+    T* fPtr{nullptr};  // nullptr or fStorage
 };
 
 /**
@@ -138,8 +138,7 @@ private:
  *
  * consume_a_thing(thing); // could be constThing or a modified copy.
  */
-template <typename T>
-class SkTCopyOnFirstWrite {
+template <typename T> class SkTCopyOnFirstWrite {
 public:
     explicit SkTCopyOnFirstWrite(const T& initial) : fObj(&initial) {}
 
@@ -148,29 +147,26 @@ public:
     // Constructor for delayed initialization.
     SkTCopyOnFirstWrite() : fObj(nullptr) {}
 
-    SkTCopyOnFirstWrite(const SkTCopyOnFirstWrite&  that) { *this = that;            }
-    SkTCopyOnFirstWrite(      SkTCopyOnFirstWrite&& that) { *this = std::move(that); }
+    SkTCopyOnFirstWrite(const SkTCopyOnFirstWrite& that) { *this = that; }
+    SkTCopyOnFirstWrite(SkTCopyOnFirstWrite&& that) { *this = std::move(that); }
 
     SkTCopyOnFirstWrite& operator=(const SkTCopyOnFirstWrite& that) {
         fLazy = that.fLazy;
-        fObj  = fLazy.isValid() ? fLazy.get() : that.fObj;
+        fObj = fLazy.isValid() ? fLazy.get() : that.fObj;
         return *this;
     }
 
     SkTCopyOnFirstWrite& operator=(SkTCopyOnFirstWrite&& that) {
         fLazy = std::move(that.fLazy);
-        fObj  = fLazy.isValid() ? fLazy.get() : that.fObj;
+        fObj = fLazy.isValid() ? fLazy.get() : that.fObj;
         return *this;
     }
 
     // Should only be called once, and only if the default constructor was used.
-    void init(const T& initial) {
-        fObj = &initial;
-    }
+    void init(const T& initial) { fObj = &initial; }
 
     // If not already initialized, in-place instantiates the writable object
-    template <typename... Args>
-    void initIfNeeded(Args&&... args) {
+    template <typename... Args> void initIfNeeded(Args&&... args) {
         if (nullptr == fObj) {
             fObj = fLazy.init(std::forward<Args>(args)...);
         }
@@ -193,14 +189,14 @@ public:
      * Operators for treating this as though it were a const pointer.
      */
 
-    const T *operator->() const { return fObj; }
+    const T* operator->() const { return fObj; }
 
     operator const T*() const { return fObj; }
 
-    const T& operator *() const { return *fObj; }
+    const T& operator*() const { return *fObj; }
 
 private:
-    const T*    fObj;
-    SkTLazy<T>  fLazy;
+    const T* fObj;
+    SkTLazy<T> fLazy;
 };
 }  // namespace pk

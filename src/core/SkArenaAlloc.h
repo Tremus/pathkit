@@ -19,10 +19,9 @@
 #include <utility>
 #include <vector>
 
-#include "include/core/SkTypes.h"
-#include "include/private/SkTFitsIn.h"
-#include "include/private/SkTo.h"
-
+#include "src/core/SkTypes.h"
+#include "src/private/SkTFitsIn.h"
+#include "src/private/SkTo.h"
 
 namespace pk {
 // We found allocating strictly doubling amounts of memory from the heap left too
@@ -31,8 +30,7 @@ namespace pk {
 
 // SkFibonacci47 is the first 47 Fibonacci numbers. Fib(47) is the largest value less than 2 ^ 32.
 extern std::array<const uint32_t, 47> SkFibonacci47;
-template<uint32_t kMaxSize>
-class SkFibBlockSizes {
+template <uint32_t kMaxSize> class SkFibBlockSizes {
 public:
     // staticBlockSize, and firstAllocationSize are parameters describing the initial memory
     // layout. staticBlockSize describes the size of the inlined memory, and firstAllocationSize
@@ -40,8 +38,9 @@ public:
     // convention, firstAllocationSize is the first choice for the block unit size followed by
     // staticBlockSize followed by the default of 1024 bytes.
     SkFibBlockSizes(uint32_t staticBlockSize, uint32_t firstAllocationSize) : fIndex{0} {
-        fBlockUnitSize = firstAllocationSize > 0 ? firstAllocationSize :
-                         staticBlockSize     > 0 ? staticBlockSize     : 1024;
+        fBlockUnitSize = firstAllocationSize > 0 ? firstAllocationSize
+                         : staticBlockSize > 0   ? staticBlockSize
+                                                 : 1024;
 
         PkASSERT_RELEASE(0 < fBlockUnitSize);
         PkASSERT_RELEASE(fBlockUnitSize < std::min(kMaxSize, (1u << 26) - 1));
@@ -51,8 +50,7 @@ public:
         uint32_t result = SkFibonacci47[fIndex] * fBlockUnitSize;
 
         if (SkTo<size_t>(fIndex + 1) < SkFibonacci47.size() &&
-            SkFibonacci47[fIndex + 1] < kMaxSize / fBlockUnitSize)
-        {
+            SkFibonacci47[fIndex + 1] < kMaxSize / fBlockUnitSize) {
             fIndex += 1;
         }
 
@@ -109,7 +107,7 @@ public:
     SkArenaAlloc(char* block, size_t blockSize, size_t firstHeapAllocation);
 
     explicit SkArenaAlloc(size_t firstHeapAllocation)
-        : SkArenaAlloc(nullptr, 0, firstHeapAllocation) {}
+            : SkArenaAlloc(nullptr, 0, firstHeapAllocation) {}
 
     SkArenaAlloc(const SkArenaAlloc&) = delete;
     SkArenaAlloc& operator=(const SkArenaAlloc&) = delete;
@@ -118,11 +116,10 @@ public:
 
     ~SkArenaAlloc();
 
-    template <typename Ctor>
-    auto make(Ctor&& ctor) -> decltype(ctor(nullptr)) {
+    template <typename Ctor> auto make(Ctor&& ctor) -> decltype(ctor(nullptr)) {
         using T = std::remove_pointer_t<decltype(ctor(nullptr))>;
 
-        uint32_t size      = ToU32(sizeof(T));
+        uint32_t size = ToU32(sizeof(T));
         uint32_t alignment = ToU32(alignof(T));
         char* objStart;
         if (std::is_trivially_destructible<T>::value) {
@@ -147,15 +144,12 @@ public:
         return ctor(objStart);
     }
 
-    template <typename T, typename... Args>
-    T* make(Args&&... args) {
-        return this->make([&](void* objStart) {
-            return new(objStart) T(std::forward<Args>(args)...);
-        });
+    template <typename T, typename... Args> T* make(Args&&... args) {
+        return this->make(
+                [&](void* objStart) { return new (objStart) T(std::forward<Args>(args)...); });
     }
 
-    template <typename T>
-    T* makeArrayDefault(size_t count) {
+    template <typename T> T* makeArrayDefault(size_t count) {
         T* array = this->allocUninitializedArray<T>(count);
         for (size_t i = 0; i < count; i++) {
             // Default initialization: if T is primitive then the value is left uninitialized.
@@ -165,13 +159,17 @@ public:
     }
 
 private:
-    static void AssertRelease(bool cond) { if (!cond) { ::abort(); } }
+    static void AssertRelease(bool cond) {
+        if (!cond) {
+            ::abort();
+        }
+    }
     static uint32_t ToU32(size_t v) {
         assert(SkTFitsIn<uint32_t>(v));
         return (uint32_t)v;
     }
 
-    using FooterAction = char* (char*);
+    using FooterAction = char*(char*);
     struct Footer {
         uint8_t unaligned_action[sizeof(FooterAction*)];
         uint8_t padding;
@@ -181,8 +179,7 @@ private:
     static void RunDtorsOnBlock(char* footerEnd);
     static char* NextBlock(char* footerEnd);
 
-    template <typename T>
-    void installRaw(const T& val) {
+    template <typename T> void installRaw(const T& val) {
         memcpy(fCursor, &val, sizeof(val));
         fCursor += sizeof(val);
     }
@@ -205,8 +202,7 @@ private:
 
     char* allocObjectWithFooter(uint32_t sizeIncludingFooter, uint32_t alignment);
 
-    template <typename T>
-    T* allocUninitializedArray(size_t countZ) {
+    template <typename T> T* allocUninitializedArray(size_t countZ) {
         AssertRelease(SkTFitsIn<uint32_t>(countZ));
         uint32_t count = ToU32(countZ);
 
@@ -231,26 +227,26 @@ private:
             fCursor = objStart + arraySize;
             this->installRaw(ToU32(count));
             this->installFooter(
-                [](char* footerEnd) {
-                    char* objEnd = footerEnd - (sizeof(Footer) + sizeof(uint32_t));
-                    uint32_t count;
-                    memmove(&count, objEnd, sizeof(uint32_t));
-                    char* objStart = objEnd - count * sizeof(T);
-                    T* array = (T*) objStart;
-                    for (uint32_t i = 0; i < count; i++) {
-                        array[i].~T();
-                    }
-                    return objStart;
-                },
-                padding);
+                    [](char* footerEnd) {
+                        char* objEnd = footerEnd - (sizeof(Footer) + sizeof(uint32_t));
+                        uint32_t count;
+                        memmove(&count, objEnd, sizeof(uint32_t));
+                        char* objStart = objEnd - count * sizeof(T);
+                        T* array = (T*)objStart;
+                        for (uint32_t i = 0; i < count; i++) {
+                            array[i].~T();
+                        }
+                        return objStart;
+                    },
+                    padding);
         }
 
         return (T*)objStart;
     }
 
-    char*          fDtorCursor;
-    char*          fCursor;
-    char*          fEnd;
+    char* fDtorCursor;
+    char* fCursor;
+    char* fEnd;
 
     SkFibBlockSizes<std::numeric_limits<uint32_t>::max()> fFibonacciProgression;
 };
@@ -264,6 +260,6 @@ template <size_t InlineStorageSize>
 class SkSTArenaAlloc : private std::array<char, InlineStorageSize>, public SkArenaAlloc {
 public:
     explicit SkSTArenaAlloc(size_t firstHeapAllocation = InlineStorageSize)
-        : SkArenaAlloc{this->data(), this->size(), firstHeapAllocation} {}
+            : SkArenaAlloc{this->data(), this->size(), firstHeapAllocation} {}
 };
 }  // namespace pk

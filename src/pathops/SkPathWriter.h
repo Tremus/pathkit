@@ -6,9 +6,9 @@
  */
 #pragma once
 
-#include "include/core/SkPath.h"
-#include "include/private/SkTArray.h"
-#include "include/private/SkTDArray.h"
+#include "src/core/SkPath.h"
+#include "src/private/SkTArray.h"
+#include "src/private/SkTDArray.h"
 
 namespace pk {
 class SkOpPtT;
@@ -43,12 +43,11 @@ private:
     bool someAssemblyRequired();
     SkPoint update(const SkOpPtT* pt);
 
-    SkPath fCurrent;  // contour under construction
-    SkTArray<SkPath> fPartials;   // contours with mismatched starts and ends
+    SkPath fCurrent;                     // contour under construction
+    SkTArray<SkPath> fPartials;          // contours with mismatched starts and ends
     SkTDArray<const SkOpPtT*> fEndPtTs;  // possible pt values for partial starts and ends
-    SkPath* fPathPtr;  // closed contours are written here
-    const SkOpPtT* fDefer[2];  // [0] deferred move, [1] deferred line
-    const SkOpPtT* fFirstPtT;  // first in current contour
+    SkPath* fPathPtr;                    // closed contours are written here
+    const SkOpPtT* fDefer[2];            // [0] deferred move, [1] deferred line
+    const SkOpPtT* fFirstPtT;            // first in current contour
 };
 }  // namespace pk
-

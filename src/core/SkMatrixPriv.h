@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "include/core/SkMatrix.h"
-#include "include/private/SkNx.h"
+#include "src/core/SkMatrix.h"
 #include "src/core/SkPointPriv.h"
+#include "src/private/SkNx.h"
 
 namespace pk {
 class SkMatrixPriv {
@@ -30,7 +30,6 @@ public:
     typedef SkMatrix::MapXYProc MapXYProc;
     typedef SkMatrix::MapPtsProc MapPtsProc;
 
-
     static MapPtsProc GetMapPtsProc(const SkMatrix& matrix) {
         return SkMatrix::GetMapPtsProc(matrix.getType());
     }
@@ -44,7 +43,8 @@ public:
      *  then this returns false and dst is unchanged.
      */
     static bool PK_WARN_UNUSED_RESULT InverseMapRect(const SkMatrix& mx,
-                                                     SkRect* dst, const SkRect& src) {
+                                                     SkRect* dst,
+                                                     const SkRect& src) {
         if (mx.getType() <= SkMatrix::kTranslate_Mask) {
             SkScalar tx = mx.getTranslateX();
             SkScalar ty = mx.getTranslateY();
@@ -127,8 +127,12 @@ public:
         @param stride  size of record starting with SkPoint, in bytes
         @param count   number of points to transform
     */
-    static void MapPointsWithStride(const SkMatrix& mx, SkPoint dst[], size_t dstStride,
-                                    const SkPoint src[], size_t srcStride, int count) {
+    static void MapPointsWithStride(const SkMatrix& mx,
+                                    SkPoint dst[],
+                                    size_t dstStride,
+                                    const SkPoint src[],
+                                    size_t srcStride,
+                                    int count) {
         for (int i = 0; i < count; ++i) {
             mx.mapPoints(dst, src, 1);
             src = (SkPoint*)((intptr_t)src + srcStride);
@@ -136,8 +140,12 @@ public:
         }
     }
 
-    static void MapHomogeneousPointsWithStride(const SkMatrix& mx, SkPoint3 dst[], size_t dstStride,
-                                               const SkPoint3 src[], size_t srcStride, int count);
+    static void MapHomogeneousPointsWithStride(const SkMatrix& mx,
+                                               SkPoint3 dst[],
+                                               size_t dstStride,
+                                               const SkPoint3 src[],
+                                               size_t srcStride,
+                                               int count);
 
     static bool PostIDiv(SkMatrix* matrix, int divx, int divy) {
         return matrix->postIDiv(divx, divy);

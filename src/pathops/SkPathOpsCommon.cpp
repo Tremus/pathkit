@@ -5,17 +5,19 @@
  * found in the LICENSE file.
  */
 
-#include "include/private/SkMacros.h"
+#include "src/pathops/SkPathOpsCommon.h"
 #include "src/core/SkTSort.h"
 #include "src/pathops/SkAddIntersections.h"
 #include "src/pathops/SkOpCoincidence.h"
 #include "src/pathops/SkOpEdgeBuilder.h"
-#include "src/pathops/SkPathOpsCommon.h"
 #include "src/pathops/SkPathWriter.h"
+#include "src/private/SkMacros.h"
 
 namespace pk {
-const SkOpAngle* AngleWinding(SkOpSpanBase* start, SkOpSpanBase* end, int* windingPtr,
-        bool* sortablePtr) {
+const SkOpAngle* AngleWinding(SkOpSpanBase* start,
+                              SkOpSpanBase* end,
+                              int* windingPtr,
+                              bool* sortablePtr) {
     // find first angle, initialize winding to computed fWindSum
     SkOpSegment* segment = start->segment();
     const SkOpAngle* angle = segment->spanToAngle(start, end);
@@ -35,7 +37,7 @@ const SkOpAngle* AngleWinding(SkOpSpanBase* start, SkOpSpanBase* end, int* windi
         }
         unorderable |= angle->unorderable();
         if ((computeWinding = unorderable || (angle == firstAngle && loop))) {
-            break;    // if we get here, there's no winding, loop is unorderable
+            break;  // if we get here, there's no winding, loop is unorderable
         }
         loop |= angle == firstAngle;
         segment = angle->segment();
@@ -80,8 +82,9 @@ SkOpSpan* FindUndone(SkOpContourHead* contourHead) {
     return nullptr;
 }
 
-SkOpSegment* FindChase(SkTDArray<SkOpSpanBase*>* chase, SkOpSpanBase** startPtr,
-        SkOpSpanBase** endPtr) {
+SkOpSegment* FindChase(SkTDArray<SkOpSpanBase*>* chase,
+                       SkOpSpanBase** startPtr,
+                       SkOpSpanBase** endPtr) {
     while (chase->count()) {
         SkOpSpanBase* span;
         chase->pop(&span);
@@ -92,11 +95,11 @@ SkOpSegment* FindChase(SkTDArray<SkOpSpanBase*>* chase, SkOpSpanBase** startPtr,
         if (SkOpAngle* last = segment->activeAngle(*startPtr, startPtr, endPtr, &done)) {
             *startPtr = last->start();
             *endPtr = last->end();
-    #if TRY_ROTATE
+#if TRY_ROTATE
             *chase->insert(0) = span;
-    #else
+#else
             *chase->append() = span;
-    #endif
+#endif
             return last->segment();
         }
         if (done) {
@@ -141,11 +144,11 @@ SkOpSegment* FindChase(SkTDArray<SkOpSpanBase*>* chase, SkOpSpanBase** startPtr,
             }
         }
         if (first) {
-       #if TRY_ROTATE
+#if TRY_ROTATE
             *chase->insert(0) = span;
-       #else
+#else
             *chase->append() = span;
-       #endif
+#endif
             return first;
         }
     }
@@ -153,7 +156,7 @@ SkOpSegment* FindChase(SkTDArray<SkOpSpanBase*>* chase, SkOpSpanBase** startPtr,
 }
 
 bool SortContourList(SkOpContourHead** contourList, bool evenOdd, bool oppEvenOdd) {
-    SkTDArray<SkOpContour* > list;
+    SkTDArray<SkOpContour*> list;
     SkOpContour* contour = *contourList;
     do {
         if (contour->count()) {
@@ -181,7 +184,7 @@ bool SortContourList(SkOpContourHead** contourList, bool evenOdd, bool oppEvenOd
     return true;
 }
 
-static void calc_angles(SkOpContourHead* contourList  DEBUG_COIN_DECLARE_PARAMS()) {
+static void calc_angles(SkOpContourHead* contourList DEBUG_COIN_DECLARE_PARAMS()) {
     DEBUG_STATIC_SET_PHASE(contourList);
     SkOpContour* contour = contourList;
     do {
@@ -189,7 +192,7 @@ static void calc_angles(SkOpContourHead* contourList  DEBUG_COIN_DECLARE_PARAMS(
     } while ((contour = contour->next()));
 }
 
-static bool missing_coincidence(SkOpContourHead* contourList  DEBUG_COIN_DECLARE_PARAMS()) {
+static bool missing_coincidence(SkOpContourHead* contourList DEBUG_COIN_DECLARE_PARAMS()) {
     DEBUG_STATIC_SET_PHASE(contourList);
     SkOpContour* contour = contourList;
     bool result = false;
@@ -199,7 +202,7 @@ static bool missing_coincidence(SkOpContourHead* contourList  DEBUG_COIN_DECLARE
     return result;
 }
 
-static bool move_multiples(SkOpContourHead* contourList  DEBUG_COIN_DECLARE_PARAMS()) {
+static bool move_multiples(SkOpContourHead* contourList DEBUG_COIN_DECLARE_PARAMS()) {
     DEBUG_STATIC_SET_PHASE(contourList);
     SkOpContour* contour = contourList;
     do {
@@ -210,7 +213,7 @@ static bool move_multiples(SkOpContourHead* contourList  DEBUG_COIN_DECLARE_PARA
     return true;
 }
 
-static bool move_nearby(SkOpContourHead* contourList  DEBUG_COIN_DECLARE_PARAMS()) {
+static bool move_nearby(SkOpContourHead* contourList DEBUG_COIN_DECLARE_PARAMS()) {
     DEBUG_STATIC_SET_PHASE(contourList);
     SkOpContour* contour = contourList;
     do {
@@ -238,11 +241,11 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
         return false;
     }
     // combine t values when multiple intersections occur on some segments but not others
-    if (!move_multiples(contourList  DEBUG_PHASE_PARAMS(kWalking))) {
+    if (!move_multiples(contourList DEBUG_PHASE_PARAMS(kWalking))) {
         return false;
     }
     // move t values and points together to eliminate small/tiny gaps
-    if (!move_nearby(contourList  DEBUG_COIN_PARAMS())) {
+    if (!move_nearby(contourList DEBUG_COIN_PARAMS())) {
         return false;
     }
     // add coincidence formed by pairing on curve points and endpoints
@@ -255,7 +258,7 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
     // look for coincidence present in A-B and A-C but missing in B-C
     do {
         bool added;
-        if (!coincidence->addMissing(&added  DEBUG_ITER_PARAMS(SAFETY_COUNT - safetyHatch))) {
+        if (!coincidence->addMissing(&added DEBUG_ITER_PARAMS(SAFETY_COUNT - safetyHatch))) {
             return false;
         }
         if (!added) {
@@ -265,21 +268,21 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
             PkASSERT(globalState->debugSkipAssert());
             return false;
         }
-        move_nearby(contourList  DEBUG_ITER_PARAMS(SAFETY_COUNT - safetyHatch - 1));
+        move_nearby(contourList DEBUG_ITER_PARAMS(SAFETY_COUNT - safetyHatch - 1));
     } while (true);
     // check to see if, loosely, coincident ranges may be expanded
     if (coincidence->expand(DEBUG_COIN_ONLY_PARAMS())) {
         bool added;
-        if (!coincidence->addMissing(&added  DEBUG_COIN_PARAMS())) {
+        if (!coincidence->addMissing(&added DEBUG_COIN_PARAMS())) {
             return false;
         }
         if (!coincidence->addExpanded(DEBUG_COIN_ONLY_PARAMS())) {
             return false;
         }
-        if (!move_multiples(contourList  DEBUG_COIN_PARAMS())) {
+        if (!move_multiples(contourList DEBUG_COIN_PARAMS())) {
             return false;
         }
-        move_nearby(contourList  DEBUG_COIN_PARAMS());
+        move_nearby(contourList DEBUG_COIN_PARAMS());
     }
     // the expanded ranges may not align -- add the missing spans
     if (!coincidence->addExpanded(DEBUG_PHASE_ONLY_PARAMS(kWalking))) {
@@ -288,8 +291,8 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
     // mark spans of coincident segments as coincident
     coincidence->mark(DEBUG_COIN_ONLY_PARAMS());
     // look for coincidence lines and curves undetected by intersection
-    if (missing_coincidence(contourList  DEBUG_COIN_PARAMS())) {
-        (void) coincidence->expand(DEBUG_PHASE_ONLY_PARAMS(kIntersecting));
+    if (missing_coincidence(contourList DEBUG_COIN_PARAMS())) {
+        (void)coincidence->expand(DEBUG_PHASE_ONLY_PARAMS(kIntersecting));
         if (!coincidence->addExpanded(DEBUG_COIN_ONLY_PARAMS())) {
             return false;
         }
@@ -297,9 +300,9 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
             return false;
         }
     } else {
-        (void) coincidence->expand(DEBUG_COIN_ONLY_PARAMS());
+        (void)coincidence->expand(DEBUG_COIN_ONLY_PARAMS());
     }
-    (void) coincidence->expand(DEBUG_COIN_ONLY_PARAMS());
+    (void)coincidence->expand(DEBUG_COIN_ONLY_PARAMS());
 
     SkOpCoincidence overlaps(globalState);
     safetyHatch = SAFETY_COUNT;
@@ -311,7 +314,7 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
         }
         // For each coincident pair that overlaps another, when the receivers (the 1st of the pair)
         // are different, construct a new pair to resolve their mutual span
-        if (!pairs->findOverlaps(&overlaps  DEBUG_ITER_PARAMS(SAFETY_COUNT - safetyHatch))) {
+        if (!pairs->findOverlaps(&overlaps DEBUG_ITER_PARAMS(SAFETY_COUNT - safetyHatch))) {
             return false;
         }
         if (!--safetyHatch) {
@@ -319,7 +322,7 @@ bool HandleCoincidence(SkOpContourHead* contourList, SkOpCoincidence* coincidenc
             return false;
         }
     } while (!overlaps.isEmpty());
-    calc_angles(contourList  DEBUG_COIN_PARAMS());
+    calc_angles(contourList DEBUG_COIN_PARAMS());
     if (!sort_angles(contourList)) {
         return false;
     }

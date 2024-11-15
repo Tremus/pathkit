@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "include/core/SkPoint.h"
+#include "src/core/SkPoint.h"
 #include "src/pathops/SkPathOpsTypes.h"
 
 namespace pk {
@@ -54,9 +54,7 @@ struct SkDVector {
     }
 
     // only used by testing
-    double cross(const SkDVector& a) const {
-        return fX * a.fY - fY * a.fX;
-    }
+    double cross(const SkDVector& a) const { return fX * a.fY - fY * a.fX; }
 
     // similar to cross, this bastardization considers nearly coincident to be zero
     // uses ulps epsilon == 16
@@ -73,17 +71,11 @@ struct SkDVector {
         return AlmostEqualUlpsNoNormalCheck(xy, yx) ? 0 : xy - yx;
     }
 
-    double dot(const SkDVector& a) const {
-        return fX * a.fX + fY * a.fY;
-    }
+    double dot(const SkDVector& a) const { return fX * a.fX + fY * a.fY; }
 
-    double length() const {
-        return sqrt(lengthSquared());
-    }
+    double length() const { return sqrt(lengthSquared()); }
 
-    double lengthSquared() const {
-        return fX * fX + fY * fY;
-    }
+    double lengthSquared() const { return fX * fX + fY * fY; }
 
     SkDVector& normalize() {
         double inverseLength = sk_ieee_double_divide(1, this->length());
@@ -92,9 +84,7 @@ struct SkDVector {
         return *this;
     }
 
-    bool isFinite() const {
-        return std::isfinite(fX) && std::isfinite(fY);
-    }
+    bool isFinite() const { return std::isfinite(fX) && std::isfinite(fY); }
 };
 
 struct SkDPoint {
@@ -107,7 +97,7 @@ struct SkDPoint {
     }
 
     friend SkDVector operator-(const SkDPoint& a, const SkDPoint& b) {
-        return { a.fX - b.fX, a.fY - b.fY };
+        return {a.fX - b.fX, a.fY - b.fY};
     }
 
     friend bool operator==(const SkDPoint& a, const SkDPoint& b) {
@@ -163,7 +153,7 @@ struct SkDPoint {
         double tiniest = std::min(std::min(std::min(fX, a.fX), fY), a.fY);
         double largest = std::max(std::max(std::max(fX, a.fX), fY), a.fY);
         largest = std::max(largest, -tiniest);
-        return AlmostDequalUlps(largest, largest + dist); // is the dist within ULPS tolerance?
+        return AlmostDequalUlps(largest, largest + dist);  // is the dist within ULPS tolerance?
     }
 
     bool approximatelyDEqual(const SkPoint& a) const {
@@ -183,7 +173,7 @@ struct SkDPoint {
         double tiniest = std::min(std::min(std::min(fX, a.fX), fY), a.fY);
         double largest = std::max(std::max(std::max(fX, a.fX), fY), a.fY);
         largest = std::max(largest, -tiniest);
-        return AlmostPequalUlps(largest, largest + dist); // is the dist within ULPS tolerance?
+        return AlmostPequalUlps(largest, largest + dist);  // is the dist within ULPS tolerance?
     }
 
     bool approximatelyEqual(const SkPoint& a) const {
@@ -206,13 +196,11 @@ struct SkDPoint {
         float tiniest = std::min(std::min(std::min(a.fX, b.fX), a.fY), b.fY);
         float largest = std::max(std::max(std::max(a.fX, b.fX), a.fY), b.fY);
         largest = std::max(largest, -tiniest);
-        return AlmostDequalUlps((double) largest, largest + dist); // is dist within ULPS tolerance?
+        return AlmostDequalUlps((double)largest, largest + dist);  // is dist within ULPS tolerance?
     }
 
     // only used by testing
-    bool approximatelyZero() const {
-        return approximately_zero(fX) && approximately_zero(fY);
-    }
+    bool approximatelyZero() const { return approximately_zero(fX) && approximately_zero(fY); }
 
     SkPoint asSkPoint() const {
         SkPoint pt = {PkDoubleToScalar(fX), PkDoubleToScalar(fY)};
@@ -244,7 +232,7 @@ struct SkDPoint {
         double tiniest = std::min(std::min(std::min(fX, a.fX), fY), a.fY);
         double largest = std::max(std::max(std::max(fX, a.fX), fY), a.fY);
         largest = std::max(largest, -tiniest);
-        return RoughlyEqualUlps(largest, largest + dist); // is the dist within ULPS tolerance?
+        return RoughlyEqualUlps(largest, largest + dist);  // is the dist within ULPS tolerance?
     }
 
     static bool RoughlyEqual(const SkPoint& a, const SkPoint& b) {
@@ -258,13 +246,13 @@ struct SkDPoint {
         float tiniest = std::min(std::min(std::min(a.fX, b.fX), a.fY), b.fY);
         float largest = std::max(std::max(std::max(a.fX, b.fX), a.fY), b.fY);
         largest = std::max(largest, -tiniest);
-        return RoughlyEqualUlps((double) largest, largest + dist); // is dist within ULPS tolerance?
+        return RoughlyEqualUlps((double)largest, largest + dist);  // is dist within ULPS tolerance?
     }
 
     // very light weight check, should only be used for inequality check
     static bool WayRoughlyEqual(const SkPoint& a, const SkPoint& b) {
-        float largestNumber = std::max(SkTAbs(a.fX), std::max(SkTAbs(a.fY),
-                std::max(SkTAbs(b.fX), SkTAbs(b.fY))));
+        float largestNumber = std::max(
+                SkTAbs(a.fX), std::max(SkTAbs(a.fY), std::max(SkTAbs(b.fX), SkTAbs(b.fY))));
         SkVector diffs = a - b;
         float largestDiff = std::max(diffs.fX, diffs.fY);
         return roughly_zero_when_compared_to(largestDiff, largestNumber);

@@ -8,8 +8,8 @@
 #ifndef GrVectorXform_DEFINED
 #define GrVectorXform_DEFINED
 
-#include "include/core/SkMatrix.h"
-#include "include/private/SkVx.h"
+#include "src/core/SkMatrix.h"
+#include "src/private/SkVx.h"
 
 namespace pk {
 // Represents the upper-left 2x2 matrix of an affine transform for applying to vectors:

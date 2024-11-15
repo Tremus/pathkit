@@ -5,22 +5,19 @@
  * found in the LICENSE file.
  */
 
-#include "include/core/SkPathBuilder.h"
-#include "include/core/SkRRect.h"
-#include "include/private/SkPathRef.h"
-#include "include/private/SkSafe32.h"
+#include "src/core/SkPathBuilder.h"
 #include "src/core/SkGeometry.h"
 #include "src/core/SkPathPriv.h"
+#include "src/core/SkRRect.h"
+#include "src/private/SkPathRef.h"
+#include "src/private/SkSafe32.h"
 // need SkDVector
 #include "src/pathops/SkPathOpsPoint.h"
 
 namespace pk {
-SkPathBuilder::SkPathBuilder() {
-    this->reset();
-}
+SkPathBuilder::SkPathBuilder() { this->reset(); }
 
-SkPathBuilder::~SkPathBuilder() {
-}
+SkPathBuilder::~SkPathBuilder() {}
 
 SkPathBuilder& SkPathBuilder::reset() {
     fPts.reset();
@@ -32,7 +29,7 @@ SkPathBuilder& SkPathBuilder::reset() {
 
     fSegmentMask = 0;
     fLastMovePoint = {0, 0};
-    fLastMoveIndex = -1;        // illegal
+    fLastMoveIndex = -1;  // illegal
     fNeedsMoveVerb = true;
 
     // testing
@@ -49,19 +46,31 @@ SkPathBuilder& SkPathBuilder::operator=(const SkPath& src) {
         auto pts = std::get<1>(iter);
         auto w = std::get<2>(iter);
         switch (verb) {
-            case SkPathVerb::kMove:  this->moveTo(pts[0]); break;
-            case SkPathVerb::kLine:  this->lineTo(pts[1]); break;
-            case SkPathVerb::kQuad:  this->quadTo(pts[1], pts[2]); break;
-            case SkPathVerb::kConic: this->conicTo(pts[1], pts[2], w[0]); break;
-            case SkPathVerb::kCubic: this->cubicTo(pts[1], pts[2], pts[3]); break;
-            case SkPathVerb::kClose: this->close(); break;
+            case SkPathVerb::kMove:
+                this->moveTo(pts[0]);
+                break;
+            case SkPathVerb::kLine:
+                this->lineTo(pts[1]);
+                break;
+            case SkPathVerb::kQuad:
+                this->quadTo(pts[1], pts[2]);
+                break;
+            case SkPathVerb::kConic:
+                this->conicTo(pts[1], pts[2], w[0]);
+                break;
+            case SkPathVerb::kCubic:
+                this->cubicTo(pts[1], pts[2], pts[3]);
+                break;
+            case SkPathVerb::kClose:
+                this->close();
+                break;
         }
     }
     return *this;
 }
 
 void SkPathBuilder::incReserve(int extraPtCount, int extraVbCount) {
-    fPts.setReserve(  Sk32_sat_add(fPts.count(),   extraPtCount));
+    fPts.setReserve(Sk32_sat_add(fPts.count(), extraPtCount));
     fVerbs.setReserve(Sk32_sat_add(fVerbs.count(), extraVbCount));
 }
 
@@ -158,7 +167,8 @@ SkPath SkPathBuilder::make(sk_sp<SkPathRef> pr) const {
             convexity = SkPathConvexity::kConvex;
             dir = fIsACCW ? SkPathFirstDirection::kCCW : SkPathFirstDirection::kCW;
             break;
-        default: break;
+        default:
+            break;
     }
 
     if (fOverrideConvexity != SkPathConvexity::kUnknown) {
@@ -174,7 +184,7 @@ SkPath SkPathBuilder::make(sk_sp<SkPathRef> pr) const {
     // This hopefully can go away in the future when Paths are immutable,
     // but if while they are still editable, we need to correctly set this.
     const uint8_t* start = path.fPathRef->verbsBegin();
-    const uint8_t* stop  = path.fPathRef->verbsEnd();
+    const uint8_t* stop = path.fPathRef->verbsEnd();
     if (start < stop) {
         // peek at the last verb, to know if our last contour is closed
         const bool isClosed = (stop[-1] == (uint8_t)SkPathVerb::kClose);
@@ -185,24 +195,21 @@ SkPath SkPathBuilder::make(sk_sp<SkPathRef> pr) const {
 }
 
 SkPath SkPathBuilder::snapshot() const {
-    return this->make(sk_sp<SkPathRef>(new SkPathRef(fPts,
-                                                     fVerbs,
-                                                     fConicWeights,
-                                                     fSegmentMask)));
+    return this->make(sk_sp<SkPathRef>(new SkPathRef(fPts, fVerbs, fConicWeights, fSegmentMask)));
 }
 
 SkPath SkPathBuilder::detach() {
-    auto path = this->make(sk_sp<SkPathRef>(new SkPathRef(std::move(fPts),
-                                                          std::move(fVerbs),
-                                                          std::move(fConicWeights),
-                                                          fSegmentMask)));
+    auto path = this->make(sk_sp<SkPathRef>(new SkPathRef(
+            std::move(fPts), std::move(fVerbs), std::move(fConicWeights), fSegmentMask)));
     this->reset();
     return path;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static bool arc_is_lone_point(const SkRect& oval, SkScalar startAngle, SkScalar sweepAngle,
+static bool arc_is_lone_point(const SkRect& oval,
+                              SkScalar startAngle,
+                              SkScalar sweepAngle,
                               SkPoint* pt) {
     if (0 == sweepAngle && (0 == startAngle || PkIntToScalar(360) == startAngle)) {
         // Chrome uses this path to move into and out of ovals. If not
@@ -225,10 +232,13 @@ static bool arc_is_lone_point(const SkRect& oval, SkScalar startAngle, SkScalar 
 
 // Return the unit vectors pointing at the start/stop points for the given start/sweep angles
 //
-static void angles_to_unit_vectors(SkScalar startAngle, SkScalar sweepAngle,
-                                   SkVector* startV, SkVector* stopV, SkRotationDirection* dir) {
+static void angles_to_unit_vectors(SkScalar startAngle,
+                                   SkScalar sweepAngle,
+                                   SkVector* startV,
+                                   SkVector* stopV,
+                                   SkRotationDirection* dir) {
     SkScalar startRad = PkDegreesToRadians(startAngle),
-             stopRad  = PkDegreesToRadians(startAngle + sweepAngle);
+             stopRad = PkDegreesToRadians(startAngle + sweepAngle);
 
     startV->fY = SkScalarSinSnapToZero(startRad);
     startV->fX = SkScalarCosSnapToZero(startRad);
@@ -247,7 +257,7 @@ static void angles_to_unit_vectors(SkScalar startAngle, SkScalar sweepAngle,
         SkScalar sw = PkScalarAbs(sweepAngle);
         if (sw < PkIntToScalar(360) && sw > PkIntToScalar(359)) {
             // make a guess at a tiny angle (in radians) to tweak by
-            SkScalar deltaRad = PkScalarCopySign(PK_Scalar1/512, sweepAngle);
+            SkScalar deltaRad = PkScalarCopySign(PK_Scalar1 / 512, sweepAngle);
             // not sure how much will be enough, so we use a loop
             do {
                 stopRad -= deltaRad;
@@ -263,10 +273,13 @@ static void angles_to_unit_vectors(SkScalar startAngle, SkScalar sweepAngle,
  *  If this returns 0, then the caller should just line-to the singlePt, else it should
  *  ignore singlePt and append the specified number of conics.
  */
-static int build_arc_conics(const SkRect& oval, const SkVector& start, const SkVector& stop,
-                            SkRotationDirection dir, SkConic conics[SkConic::kMaxConicsForArc],
+static int build_arc_conics(const SkRect& oval,
+                            const SkVector& start,
+                            const SkVector& stop,
+                            SkRotationDirection dir,
+                            SkConic conics[SkConic::kMaxConicsForArc],
                             SkPoint* singlePt) {
-    SkMatrix    matrix;
+    SkMatrix matrix;
 
     matrix.setScale(PkScalarHalf(oval.width()), PkScalarHalf(oval.height()));
     matrix.postTranslate(oval.centerX(), oval.centerY());
@@ -279,84 +292,76 @@ static int build_arc_conics(const SkRect& oval, const SkVector& start, const SkV
 }
 
 namespace {
-    template <unsigned N> class PointIterator {
-    public:
-        PointIterator(SkPathDirection dir, unsigned startIndex)
-            : fCurrent(startIndex % N)
-            , fAdvance(dir == SkPathDirection::kCW ? 1 : N - 1)
-        {}
+template <unsigned N> class PointIterator {
+public:
+    PointIterator(SkPathDirection dir, unsigned startIndex)
+            : fCurrent(startIndex % N), fAdvance(dir == SkPathDirection::kCW ? 1 : N - 1) {}
 
-        const SkPoint& current() const {
-            return fPts[fCurrent];
-        }
+    const SkPoint& current() const { return fPts[fCurrent]; }
 
-        const SkPoint& next() {
-            fCurrent = (fCurrent + fAdvance) % N;
-            return this->current();
-        }
+    const SkPoint& next() {
+        fCurrent = (fCurrent + fAdvance) % N;
+        return this->current();
+    }
 
-    protected:
-        SkPoint fPts[N];
+protected:
+    SkPoint fPts[N];
 
-    private:
-        unsigned fCurrent;
-        unsigned fAdvance;
-    };
+private:
+    unsigned fCurrent;
+    unsigned fAdvance;
+};
 
-    class RectPointIterator : public PointIterator<4> {
-    public:
-        RectPointIterator(const SkRect& rect, SkPathDirection dir, unsigned startIndex)
-        : PointIterator(dir, startIndex) {
+class RectPointIterator : public PointIterator<4> {
+public:
+    RectPointIterator(const SkRect& rect, SkPathDirection dir, unsigned startIndex)
+            : PointIterator(dir, startIndex) {
+        fPts[0] = SkPoint::Make(rect.fLeft, rect.fTop);
+        fPts[1] = SkPoint::Make(rect.fRight, rect.fTop);
+        fPts[2] = SkPoint::Make(rect.fRight, rect.fBottom);
+        fPts[3] = SkPoint::Make(rect.fLeft, rect.fBottom);
+    }
+};
 
-            fPts[0] = SkPoint::Make(rect.fLeft, rect.fTop);
-            fPts[1] = SkPoint::Make(rect.fRight, rect.fTop);
-            fPts[2] = SkPoint::Make(rect.fRight, rect.fBottom);
-            fPts[3] = SkPoint::Make(rect.fLeft, rect.fBottom);
-        }
-    };
+class OvalPointIterator : public PointIterator<4> {
+public:
+    OvalPointIterator(const SkRect& oval, SkPathDirection dir, unsigned startIndex)
+            : PointIterator(dir, startIndex) {
+        const SkScalar cx = oval.centerX();
+        const SkScalar cy = oval.centerY();
 
-    class OvalPointIterator : public PointIterator<4> {
-    public:
-        OvalPointIterator(const SkRect& oval, SkPathDirection dir, unsigned startIndex)
-        : PointIterator(dir, startIndex) {
+        fPts[0] = SkPoint::Make(cx, oval.fTop);
+        fPts[1] = SkPoint::Make(oval.fRight, cy);
+        fPts[2] = SkPoint::Make(cx, oval.fBottom);
+        fPts[3] = SkPoint::Make(oval.fLeft, cy);
+    }
+};
 
-            const SkScalar cx = oval.centerX();
-            const SkScalar cy = oval.centerY();
+class RRectPointIterator : public PointIterator<8> {
+public:
+    RRectPointIterator(const SkRRect& rrect, SkPathDirection dir, unsigned startIndex)
+            : PointIterator(dir, startIndex) {
+        const SkRect& bounds = rrect.getBounds();
+        const SkScalar L = bounds.fLeft;
+        const SkScalar T = bounds.fTop;
+        const SkScalar R = bounds.fRight;
+        const SkScalar B = bounds.fBottom;
 
-            fPts[0] = SkPoint::Make(cx, oval.fTop);
-            fPts[1] = SkPoint::Make(oval.fRight, cy);
-            fPts[2] = SkPoint::Make(cx, oval.fBottom);
-            fPts[3] = SkPoint::Make(oval.fLeft, cy);
-        }
-    };
-
-    class RRectPointIterator : public PointIterator<8> {
-    public:
-        RRectPointIterator(const SkRRect& rrect, SkPathDirection dir, unsigned startIndex)
-            : PointIterator(dir, startIndex)
-        {
-            const SkRect& bounds = rrect.getBounds();
-            const SkScalar L = bounds.fLeft;
-            const SkScalar T = bounds.fTop;
-            const SkScalar R = bounds.fRight;
-            const SkScalar B = bounds.fBottom;
-
-            fPts[0] = SkPoint::Make(L + rrect.radii(SkRRect::kUpperLeft_Corner).fX, T);
-            fPts[1] = SkPoint::Make(R - rrect.radii(SkRRect::kUpperRight_Corner).fX, T);
-            fPts[2] = SkPoint::Make(R, T + rrect.radii(SkRRect::kUpperRight_Corner).fY);
-            fPts[3] = SkPoint::Make(R, B - rrect.radii(SkRRect::kLowerRight_Corner).fY);
-            fPts[4] = SkPoint::Make(R - rrect.radii(SkRRect::kLowerRight_Corner).fX, B);
-            fPts[5] = SkPoint::Make(L + rrect.radii(SkRRect::kLowerLeft_Corner).fX, B);
-            fPts[6] = SkPoint::Make(L, B - rrect.radii(SkRRect::kLowerLeft_Corner).fY);
-            fPts[7] = SkPoint::Make(L, T + rrect.radii(SkRRect::kUpperLeft_Corner).fY);
-        }
-    };
-} // anonymous namespace
-
+        fPts[0] = SkPoint::Make(L + rrect.radii(SkRRect::kUpperLeft_Corner).fX, T);
+        fPts[1] = SkPoint::Make(R - rrect.radii(SkRRect::kUpperRight_Corner).fX, T);
+        fPts[2] = SkPoint::Make(R, T + rrect.radii(SkRRect::kUpperRight_Corner).fY);
+        fPts[3] = SkPoint::Make(R, B - rrect.radii(SkRRect::kLowerRight_Corner).fY);
+        fPts[4] = SkPoint::Make(R - rrect.radii(SkRRect::kLowerRight_Corner).fX, B);
+        fPts[5] = SkPoint::Make(L + rrect.radii(SkRRect::kLowerLeft_Corner).fX, B);
+        fPts[6] = SkPoint::Make(L, B - rrect.radii(SkRRect::kLowerLeft_Corner).fY);
+        fPts[7] = SkPoint::Make(L, T + rrect.radii(SkRRect::kUpperLeft_Corner).fY);
+    }
+};
+}  // anonymous namespace
 
 SkPathBuilder& SkPathBuilder::addRect(const SkRect& rect, SkPathDirection dir, unsigned index) {
-    const int kPts   = 4;   // moveTo + 3 lines
-    const int kVerbs = 5;   // moveTo + 3 lines + close
+    const int kPts = 4;    // moveTo + 3 lines
+    const int kVerbs = 5;  // moveTo + 3 lines + close
     this->incReserve(kPts, kVerbs);
 
     RectPointIterator iter(rect, dir, index);
@@ -371,8 +376,8 @@ SkPathBuilder& SkPathBuilder::addRect(const SkRect& rect, SkPathDirection dir, u
 SkPathBuilder& SkPathBuilder::addOval(const SkRect& oval, SkPathDirection dir, unsigned index) {
     const IsA prevIsA = fIsA;
 
-    const int kPts   = 9;   // moveTo + 4 conics(2 pts each)
-    const int kVerbs = 6;   // moveTo + 4 conics + close
+    const int kPts = 9;    // moveTo + 4 conics(2 pts each)
+    const int kVerbs = 6;  // moveTo + 4 conics + close
     this->incReserve(kPts, kVerbs);
 
     OvalPointIterator ovalIter(oval, dir, index);
@@ -387,8 +392,8 @@ SkPathBuilder& SkPathBuilder::addOval(const SkRect& oval, SkPathDirection dir, u
     this->close();
 
     if (prevIsA == kIsA_JustMoves) {
-        fIsA      = kIsA_Oval;
-        fIsACCW   = (dir == SkPathDirection::kCCW);
+        fIsA = kIsA_Oval;
+        fIsACCW = (dir == SkPathDirection::kCCW);
         fIsAStart = index % 4;
     }
     return *this;
@@ -409,9 +414,8 @@ SkPathBuilder& SkPathBuilder::addRRect(const SkRRect& rrect, SkPathDirection dir
         const bool startsWithConic = ((index & 1) == (dir == SkPathDirection::kCW));
         const SkScalar weight = PK_ScalarRoot2Over2;
 
-        const int kVerbs = startsWithConic
-            ? 9   // moveTo + 4x conicTo + 3x lineTo + close
-            : 10; // moveTo + 4x lineTo + 4x conicTo + close
+        const int kVerbs = startsWithConic ? 9    // moveTo + 4x conicTo + 3x lineTo + close
+                                           : 10;  // moveTo + 4x lineTo + 4x conicTo + close
         this->incReserve(kVerbs);
 
         RRectPointIterator rrectIter(rrect, dir, index);
@@ -438,8 +442,8 @@ SkPathBuilder& SkPathBuilder::addRRect(const SkRRect& rrect, SkPathDirection dir
     }
 
     if (prevIsA == kIsA_JustMoves) {
-        fIsA      = kIsA_RRect;
-        fIsACCW   = (dir == SkPathDirection::kCCW);
+        fIsA = kIsA_RRect;
+        fIsACCW = (dir == SkPathDirection::kCCW);
         fIsAStart = index % 8;
     }
     return *this;
@@ -493,13 +497,26 @@ SkPathBuilder& SkPathBuilder::addPath(const SkPath& src) {
 
     while ((verb = iter.next(pts)) != SkPath::kDone_Verb) {
         switch (verb) {
-            case SkPath::kMove_Verb:  this->moveTo (pts[0]); break;
-            case SkPath::kLine_Verb:  this->lineTo (pts[1]); break;
-            case SkPath::kQuad_Verb:  this->quadTo (pts[1], pts[2]); break;
-            case SkPath::kCubic_Verb: this->cubicTo(pts[1], pts[2], pts[3]); break;
-            case SkPath::kConic_Verb: this->conicTo(pts[1], pts[2], iter.conicWeight()); break;
-            case SkPath::kClose_Verb: this->close(); break;
-            case SkPath::kDone_Verb: PkUNREACHABLE;
+            case SkPath::kMove_Verb:
+                this->moveTo(pts[0]);
+                break;
+            case SkPath::kLine_Verb:
+                this->lineTo(pts[1]);
+                break;
+            case SkPath::kQuad_Verb:
+                this->quadTo(pts[1], pts[2]);
+                break;
+            case SkPath::kCubic_Verb:
+                this->cubicTo(pts[1], pts[2], pts[3]);
+                break;
+            case SkPath::kConic_Verb:
+                this->conicTo(pts[1], pts[2], iter.conicWeight());
+                break;
+            case SkPath::kClose_Verb:
+                this->close();
+                break;
+            case SkPath::kDone_Verb:
+                PkUNREACHABLE;
         }
     }
 
@@ -507,7 +524,6 @@ SkPathBuilder& SkPathBuilder::addPath(const SkPath& src) {
 }
 
 SkPathBuilder& SkPathBuilder::privateReverseAddPath(const SkPath& src) {
-
     const uint8_t* verbsBegin = src.fPathRef->verbsBegin();
     const uint8_t* verbs = src.fPathRef->verbsEnd();
     const SkPoint* pts = src.fPathRef->pointsEnd();
@@ -532,7 +548,7 @@ SkPathBuilder& SkPathBuilder::privateReverseAddPath(const SkPath& src) {
                     needClose = false;
                 }
                 needMove = true;
-                pts += 1;   // so we see the point in "if (needMove)" above
+                pts += 1;  // so we see the point in "if (needMove)" above
                 break;
             case SkPathVerb::kLine:
                 this->lineTo(pts[0]);

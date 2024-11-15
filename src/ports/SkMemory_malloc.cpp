@@ -5,16 +5,15 @@
  * found in the LICENSE file.
  */
 
-#include "include/private/SkMalloc.h"
 #include <cstdlib>
+#include "src/private/SkMalloc.h"
 
 namespace pk {
 
 #define PK_DEBUGFAILF(fmt, ...)
 
 static inline void sk_out_of_memory(size_t size) {
-    PK_DEBUGFAILF("sk_out_of_memory (asked for %zu bytes)",
-                  size);
+    PK_DEBUGFAILF("sk_out_of_memory (asked for %zu bytes)", size);
 #if defined(PK_BUILD_FOR_AFL_FUZZ)
     exit(1);
 #else

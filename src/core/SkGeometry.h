@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "include/core/SkMatrix.h"
-#include "include/private/SkNx.h"
-#include "include/private/SkTemplates.h"
+#include "src/core/SkMatrix.h"
+#include "src/private/SkNx.h"
+#include "src/private/SkTemplates.h"
 
 namespace pk {
 
@@ -57,7 +57,6 @@ void SkChopQuadAt(const SkPoint src[3], SkPoint dst[5], SkScalar t);
     The new quads are returned in dst[0..2] and dst[2..4]
 */
 void SkChopQuadAtHalf(const SkPoint src[3], SkPoint dst[5]);
-
 
 /** Given 3 points on a quadratic bezier, chop it into 1, 2 beziers such that
     the resulting beziers are monotonic in Y. This is called by the scan converter.
@@ -382,8 +381,7 @@ public:
         return pts;
     }
 
-    const SkPoint* computeQuads(const SkPoint pts[3], SkScalar weight,
-                                SkScalar tol) {
+    const SkPoint* computeQuads(const SkPoint pts[3], SkScalar weight, SkScalar tol) {
         SkConic conic;
         conic.set(pts, weight);
         return computeQuads(conic, tol);
@@ -393,10 +391,10 @@ public:
 
 private:
     enum {
-        kQuadCount = 8, // should handle most conics
+        kQuadCount = 8,  // should handle most conics
         kPointCount = 1 + 2 * kQuadCount,
     };
     SkAutoSTMalloc<kPointCount, SkPoint> fStorage;
-    int fQuadCount; // #quads for current usage
+    int fQuadCount;  // #quads for current usage
 };
 }  // namespace pk

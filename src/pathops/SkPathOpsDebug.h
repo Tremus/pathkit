@@ -6,11 +6,11 @@
  */
 #pragma once
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "include/core/SkTypes.h"
-#include "include/pathops/SkPathOps.h"
+#include "src/core/SkTypes.h"
+#include "src/pathops/SkPathOps.h"
 
 namespace pk {
 enum class SkOpPhase : char;
@@ -31,10 +31,10 @@ struct SkDCubic;
 class SkTSect;
 
 // fake classes to fool msvs Visual Studio 2018 Immediate Window
-#define FakeClasses(a, b) \
-class SkDebugTCoincident##a##b; \
-class SkDebugTSect##a##b; \
-class SkDebugTSpan##a##b
+#define FakeClasses(a, b)           \
+    class SkDebugTCoincident##a##b; \
+    class SkDebugTSect##a##b;       \
+    class SkDebugTSpan##a##b
 
 FakeClasses(Quad, Quad);
 FakeClasses(Conic, Quad);
@@ -57,19 +57,22 @@ FakeClasses(Cubic, Cubic);
 #define ONE_OFF_DEBUG_MATHEMATICA 0
 
 #if defined(PK_BUILD_FOR_WIN) || defined(PK_BUILD_FOR_ANDROID)
-    #define PK_RAND(seed) rand()
+#define PK_RAND(seed) rand()
 #else
-    #define PK_RAND(seed) rand_r(&seed)
+#define PK_RAND(seed) rand_r(&seed)
 #endif
 #ifdef PK_BUILD_FOR_WIN
-    #define PK_SNPRINTF _snprintf
+#define PK_SNPRINTF _snprintf
 #else
-    #define PK_SNPRINTF snprintf
+#define PK_SNPRINTF snprintf
 #endif
 
-#define WIND_AS_STRING(x) char x##Str[12]; \
-        if (!SkPathOpsDebug::ValidWind(x)) strcpy(x##Str, "?"); \
-        else PK_SNPRINTF(x##Str, sizeof(x##Str), "%d", x)
+#define WIND_AS_STRING(x)              \
+    char x##Str[12];                   \
+    if (!SkPathOpsDebug::ValidWind(x)) \
+        strcpy(x##Str, "?");           \
+    else                               \
+        PK_SNPRINTF(x##Str, sizeof(x##Str), "%d", x)
 
 #if FORCE_RELEASE
 
@@ -81,8 +84,8 @@ FakeClasses(Cubic, Cubic);
 #define DEBUG_ANGLE 0
 #define DEBUG_ASSEMBLE 0
 #define DEBUG_COINCIDENCE 0
-#define DEBUG_COINCIDENCE_DUMP 0  // accumulate and dump which algorithms fired
-#define DEBUG_COINCIDENCE_ORDER 0  // for well behaved curves, check if pairs match up in t-order
+#define DEBUG_COINCIDENCE_DUMP 0     // accumulate and dump which algorithms fired
+#define DEBUG_COINCIDENCE_ORDER 0    // for well behaved curves, check if pairs match up in t-order
 #define DEBUG_COINCIDENCE_VERBOSE 0  // usually whether the next function generates coincidence
 #define DEBUG_CUBIC_BINARY_SEARCH 0
 #define DEBUG_CUBIC_SPLIT 0
@@ -124,7 +127,7 @@ FakeClasses(Cubic, Cubic);
 #define DEBUG_PATH_CONSTRUCTION 1
 #define DEBUG_PERP 1
 #define DEBUG_SORT 1
-#define DEBUG_T_SECT 0        // enabling may trigger validate asserts even though op does not fail
+#define DEBUG_T_SECT 0       // enabling may trigger validate asserts even though op does not fail
 #define DEBUG_T_SECT_DUMP 0  // Use 1 normally. Use 2 to number segments, 3 for script output
 #define DEBUG_T_SECT_LOOP_COUNT 0
 #define DEBUG_VALIDATE 1
@@ -134,106 +137,87 @@ FakeClasses(Cubic, Cubic);
 #endif
 
 #ifdef PK_RELEASE
-    #define PkDEBUGRELEASE(a, b) b
-    #define PkDEBUGPARAMS(...)
+#define PkDEBUGRELEASE(a, b) b
+#define PkDEBUGPARAMS(...)
 #else
-    #define PkDEBUGRELEASE(a, b) a
-    #define PkDEBUGPARAMS(...) , __VA_ARGS__
+#define PkDEBUGRELEASE(a, b) a
+#define PkDEBUGPARAMS(...) , __VA_ARGS__
 #endif
 
 #if DEBUG_VALIDATE == 0
-    #define PATH_OPS_DEBUG_VALIDATE_PARAMS(...)
+#define PATH_OPS_DEBUG_VALIDATE_PARAMS(...)
 #else
-    #define PATH_OPS_DEBUG_VALIDATE_PARAMS(...) , __VA_ARGS__
+#define PATH_OPS_DEBUG_VALIDATE_PARAMS(...) , __VA_ARGS__
 #endif
 
 #if DEBUG_T_SECT == 0
-    #define PATH_OPS_DEBUG_T_SECT_RELEASE(a, b) b
-    #define PATH_OPS_DEBUG_T_SECT_PARAMS(...)
-    #define PATH_OPS_DEBUG_T_SECT_CODE(...)
+#define PATH_OPS_DEBUG_T_SECT_RELEASE(a, b) b
+#define PATH_OPS_DEBUG_T_SECT_PARAMS(...)
+#define PATH_OPS_DEBUG_T_SECT_CODE(...)
 #else
-    #define PATH_OPS_DEBUG_T_SECT_RELEASE(a, b) a
-    #define PATH_OPS_DEBUG_T_SECT_PARAMS(...) , __VA_ARGS__
-    #define PATH_OPS_DEBUG_T_SECT_CODE(...) __VA_ARGS__
+#define PATH_OPS_DEBUG_T_SECT_RELEASE(a, b) a
+#define PATH_OPS_DEBUG_T_SECT_PARAMS(...) , __VA_ARGS__
+#define PATH_OPS_DEBUG_T_SECT_CODE(...) __VA_ARGS__
 #endif
 
 #if DEBUG_T_SECT_DUMP > 1
-    extern int gDumpTSectNum;
+extern int gDumpTSectNum;
 #endif
 
 #if DEBUG_COINCIDENCE || DEBUG_COINCIDENCE_DUMP
-    #define DEBUG_COIN 1
+#define DEBUG_COIN 1
 #else
-    #define DEBUG_COIN 0
+#define DEBUG_COIN 0
 #endif
 
 #if DEBUG_COIN
-    #define DEBUG_COIN_DECLARE_ONLY_PARAMS() \
-            int lineNo, SkOpPhase phase, int iteration
-    #define DEBUG_COIN_DECLARE_PARAMS() \
-            , DEBUG_COIN_DECLARE_ONLY_PARAMS()
-    #define DEBUG_COIN_ONLY_PARAMS() \
-            __LINE__, SkOpPhase::kNoChange, 0
-    #define DEBUG_COIN_PARAMS() \
-            , DEBUG_COIN_ONLY_PARAMS()
-    #define DEBUG_ITER_ONLY_PARAMS(iteration) \
-            __LINE__, SkOpPhase::kNoChange, iteration
-    #define DEBUG_ITER_PARAMS(iteration) \
-            , DEBUG_ITER_ONLY_PARAMS(iteration)
-    #define DEBUG_PHASE_ONLY_PARAMS(phase) \
-            __LINE__, SkOpPhase::phase, 0
-    #define DEBUG_PHASE_PARAMS(phase) \
-            , DEBUG_PHASE_ONLY_PARAMS(phase)
-    #define DEBUG_SET_PHASE() \
-            this->globalState()->debugSetPhase(__func__, lineNo, phase, iteration)
-    #define DEBUG_STATIC_SET_PHASE(obj) \
-            obj->globalState()->debugSetPhase(__func__, lineNo, phase, iteration)
+#define DEBUG_COIN_DECLARE_ONLY_PARAMS() int lineNo, SkOpPhase phase, int iteration
+#define DEBUG_COIN_DECLARE_PARAMS() , DEBUG_COIN_DECLARE_ONLY_PARAMS()
+#define DEBUG_COIN_ONLY_PARAMS() __LINE__, SkOpPhase::kNoChange, 0
+#define DEBUG_COIN_PARAMS() , DEBUG_COIN_ONLY_PARAMS()
+#define DEBUG_ITER_ONLY_PARAMS(iteration) __LINE__, SkOpPhase::kNoChange, iteration
+#define DEBUG_ITER_PARAMS(iteration) , DEBUG_ITER_ONLY_PARAMS(iteration)
+#define DEBUG_PHASE_ONLY_PARAMS(phase) __LINE__, SkOpPhase::phase, 0
+#define DEBUG_PHASE_PARAMS(phase) , DEBUG_PHASE_ONLY_PARAMS(phase)
+#define DEBUG_SET_PHASE() this->globalState()->debugSetPhase(__func__, lineNo, phase, iteration)
+#define DEBUG_STATIC_SET_PHASE(obj) \
+    obj->globalState()->debugSetPhase(__func__, lineNo, phase, iteration)
 #elif DEBUG_VALIDATE
-    #define DEBUG_COIN_DECLARE_ONLY_PARAMS() \
-            SkOpPhase phase
-    #define DEBUG_COIN_DECLARE_PARAMS() \
-            , DEBUG_COIN_DECLARE_ONLY_PARAMS()
-    #define DEBUG_COIN_ONLY_PARAMS() \
-            SkOpPhase::kNoChange
-    #define DEBUG_COIN_PARAMS() \
-            , DEBUG_COIN_ONLY_PARAMS()
-    #define DEBUG_ITER_ONLY_PARAMS(iteration) \
-            SkOpPhase::kNoChange
-    #define DEBUG_ITER_PARAMS(iteration) \
-            , DEBUG_ITER_ONLY_PARAMS(iteration)
-    #define DEBUG_PHASE_ONLY_PARAMS(phase) \
-            SkOpPhase::phase
-    #define DEBUG_PHASE_PARAMS(phase) \
-            , DEBUG_PHASE_ONLY_PARAMS(phase)
-    #define DEBUG_SET_PHASE() \
-            this->globalState()->debugSetPhase(phase)
-    #define DEBUG_STATIC_SET_PHASE(obj) \
-            obj->globalState()->debugSetPhase(phase)
+#define DEBUG_COIN_DECLARE_ONLY_PARAMS() SkOpPhase phase
+#define DEBUG_COIN_DECLARE_PARAMS() , DEBUG_COIN_DECLARE_ONLY_PARAMS()
+#define DEBUG_COIN_ONLY_PARAMS() SkOpPhase::kNoChange
+#define DEBUG_COIN_PARAMS() , DEBUG_COIN_ONLY_PARAMS()
+#define DEBUG_ITER_ONLY_PARAMS(iteration) SkOpPhase::kNoChange
+#define DEBUG_ITER_PARAMS(iteration) , DEBUG_ITER_ONLY_PARAMS(iteration)
+#define DEBUG_PHASE_ONLY_PARAMS(phase) SkOpPhase::phase
+#define DEBUG_PHASE_PARAMS(phase) , DEBUG_PHASE_ONLY_PARAMS(phase)
+#define DEBUG_SET_PHASE() this->globalState()->debugSetPhase(phase)
+#define DEBUG_STATIC_SET_PHASE(obj) obj->globalState()->debugSetPhase(phase)
 #else
-    #define DEBUG_COIN_DECLARE_ONLY_PARAMS()
-    #define DEBUG_COIN_DECLARE_PARAMS()
-    #define DEBUG_COIN_ONLY_PARAMS()
-    #define DEBUG_COIN_PARAMS()
-    #define DEBUG_ITER_ONLY_PARAMS(iteration)
-    #define DEBUG_ITER_PARAMS(iteration)
-    #define DEBUG_PHASE_ONLY_PARAMS(phase)
-    #define DEBUG_PHASE_PARAMS(phase)
-    #define DEBUG_SET_PHASE()
-    #define DEBUG_STATIC_SET_PHASE(obj)
+#define DEBUG_COIN_DECLARE_ONLY_PARAMS()
+#define DEBUG_COIN_DECLARE_PARAMS()
+#define DEBUG_COIN_ONLY_PARAMS()
+#define DEBUG_COIN_PARAMS()
+#define DEBUG_ITER_ONLY_PARAMS(iteration)
+#define DEBUG_ITER_PARAMS(iteration)
+#define DEBUG_PHASE_ONLY_PARAMS(phase)
+#define DEBUG_PHASE_PARAMS(phase)
+#define DEBUG_SET_PHASE()
+#define DEBUG_STATIC_SET_PHASE(obj)
 #endif
 
-#define CUBIC_DEBUG_STR  "{{{%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}}}"
+#define CUBIC_DEBUG_STR "{{{%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}}}"
 #define CONIC_DEBUG_STR "{{{{%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}}}, %1.9g}"
-#define QUAD_DEBUG_STR   "{{{%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}}}"
-#define LINE_DEBUG_STR   "{{{%1.9g,%1.9g}, {%1.9g,%1.9g}}}"
+#define QUAD_DEBUG_STR "{{{%1.9g,%1.9g}, {%1.9g,%1.9g}, {%1.9g,%1.9g}}}"
+#define LINE_DEBUG_STR "{{{%1.9g,%1.9g}, {%1.9g,%1.9g}}}"
 #define PT_DEBUG_STR "{{%1.9g,%1.9g}}"
 
 #define T_DEBUG_STR(t, n) #t "[" #n "]=%1.9g"
 #define TX_DEBUG_STR(t) #t "[%d]=%1.9g"
 #define CUBIC_DEBUG_DATA(c) c[0].fX, c[0].fY, c[1].fX, c[1].fY, c[2].fX, c[2].fY, c[3].fX, c[3].fY
 #define CONIC_DEBUG_DATA(c, w) c[0].fX, c[0].fY, c[1].fX, c[1].fY, c[2].fX, c[2].fY, w
-#define QUAD_DEBUG_DATA(q)  q[0].fX, q[0].fY, q[1].fX, q[1].fY, q[2].fX, q[2].fY
-#define LINE_DEBUG_DATA(l)  l[0].fX, l[0].fY, l[1].fX, l[1].fY
+#define QUAD_DEBUG_DATA(q) q[0].fX, q[0].fY, q[1].fX, q[1].fY, q[2].fX, q[2].fY
+#define LINE_DEBUG_DATA(l) l[0].fX, l[0].fY, l[1].fX, l[1].fY
 #define PT_DEBUG_DATA(i, n) i.pt(n).asSkPoint().fX, i.pt(n).asSkPoint().fY
 
 #ifndef DEBUG_TEST
@@ -241,11 +225,19 @@ FakeClasses(Cubic, Cubic);
 #endif
 
 // Tests with extreme numbers may fail, but all other tests should never fail.
-#define FAIL_IF(cond) \
-        do { bool fail = (cond); PkOPASSERT(!fail); if (fail) return false; } while (false)
+#define FAIL_IF(cond)           \
+    do {                        \
+        bool fail = (cond);     \
+        PkOPASSERT(!fail);      \
+        if (fail) return false; \
+    } while (false)
 
-#define FAIL_WITH_NULL_IF(cond) \
-        do { bool fail = (cond); PkOPASSERT(!fail); if (fail) return nullptr; } while (false)
+#define FAIL_WITH_NULL_IF(cond)   \
+    do {                          \
+        bool fail = (cond);       \
+        PkOPASSERT(!fail);        \
+        if (fail) return nullptr; \
+    } while (false)
 
 class SkPathOpsDebug {
 public:
@@ -336,7 +328,7 @@ public:
     static bool gVerifyOp;
 #endif
 
-    static const char* OpStr(SkPathOp );
+    static const char* OpStr(SkPathOp);
     static void MathematicaIze(char* str, size_t bufferSize);
     static bool ValidWind(int winding);
     static void WindingPrintf(int winding);
@@ -345,15 +337,14 @@ public:
     static void ShowOnePath(const SkPath& path, const char* name, bool includeDeclaration);
     static void ShowPath(const SkPath& one, const SkPath& two, SkPathOp op, const char* name);
 
-    static bool ChaseContains(const SkTDArray<SkOpSpanBase*>& , const SkOpSpanBase* );
+    static bool ChaseContains(const SkTDArray<SkOpSpanBase*>&, const SkOpSpanBase*);
 
     static void CheckHealth(class SkOpContourHead* contourList);
 
 #if DEBUG_COIN
-   static void DumpCoinDict();
-   static void DumpGlitchType(GlitchType );
+    static void DumpCoinDict();
+    static void DumpGlitchType(GlitchType);
 #endif
-
 };
 
 // Visual Studio 2017 does not permit calling member functions from the Immediate Window.
@@ -395,16 +386,13 @@ const SkOpSegment* SpanSegment(const SkOpSpanBase*, int id);
 const SkOpSpanBase* SpanSpan(const SkOpSpanBase*, int id);
 
 #if DEBUG_DUMP_VERIFY
-void DumpOp(const SkPath& one, const SkPath& two, SkPathOp op,
-        const char* testName);
-void DumpOp(FILE* file, const SkPath& one, const SkPath& two, SkPathOp op,
-        const char* testName);
+void DumpOp(const SkPath& one, const SkPath& two, SkPathOp op, const char* testName);
+void DumpOp(FILE* file, const SkPath& one, const SkPath& two, SkPathOp op, const char* testName);
 void DumpSimplify(const SkPath& path, const char* testName);
 void DumpSimplify(FILE* file, const SkPath& path, const char* testName);
 void ReportOpFail(const SkPath& one, const SkPath& two, SkPathOp op);
 void ReportSimplifyFail(const SkPath& path);
-void VerifyOp(const SkPath& one, const SkPath& two, SkPathOp op,
-    const SkPath& result);
+void VerifyOp(const SkPath& one, const SkPath& two, SkPathOp op, const SkPath& result);
 void VerifySimplify(const SkPath& path, const SkPath& result);
 #endif
 }  // namespace pk

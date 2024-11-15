@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "include/core/SkPath.h"
+#include "src/core/SkPath.h"
 #include "src/pathops/SkOpContour.h"
 #include "src/pathops/SkOpSegment.h"
 
@@ -31,40 +31,24 @@ public:
         return fSegment != nullptr;
     }
 
-    SkScalar bottom() const {
-        return bounds().fBottom;
-    }
+    SkScalar bottom() const { return bounds().fBottom; }
 
-    const SkPathOpsBounds& bounds() const {
-        return fSegment->bounds();
-    }
+    const SkPathOpsBounds& bounds() const { return fSegment->bounds(); }
 
-    SkOpContour* contour() const {
-        return fSegment->contour();
-    }
+    SkOpContour* contour() const { return fSegment->contour(); }
 
-    void init(SkOpContour* contour) {
-        fSegment = contour->first();
-    }
+    void init(SkOpContour* contour) { fSegment = contour->first(); }
 
-    SkScalar left() const {
-        return bounds().fLeft;
-    }
+    SkScalar left() const { return bounds().fLeft; }
 
-    const SkPoint* pts() const {
-        return fSegment->pts();
-    }
+    const SkPoint* pts() const { return fSegment->pts(); }
 
-    SkScalar right() const {
-        return bounds().fRight;
-    }
+    SkScalar right() const { return bounds().fRight; }
 
-    SkOpSegment* segment() const {
-        return fSegment;
-    }
+    SkOpSegment* segment() const { return fSegment; }
 
     SegmentType segmentType() const {
-        SegmentType type = (SegmentType) fSegment->verb();
+        SegmentType type = (SegmentType)fSegment->verb();
         if (type != kLine_Segment) {
             return type;
         }
@@ -82,29 +66,17 @@ public:
         return fSegment != nullptr;
     }
 
-    SkScalar top() const {
-        return bounds().fTop;
-    }
+    SkScalar top() const { return bounds().fTop; }
 
-    SkScalar weight() const {
-        return fSegment->weight();
-    }
+    SkScalar weight() const { return fSegment->weight(); }
 
-    SkScalar x() const {
-        return bounds().fLeft;
-    }
+    SkScalar x() const { return bounds().fLeft; }
 
-    bool xFlipped() const {
-        return x() != pts()[0].fX;
-    }
+    bool xFlipped() const { return x() != pts()[0].fX; }
 
-    SkScalar y() const {
-        return bounds().fTop;
-    }
+    SkScalar y() const { return bounds().fTop; }
 
-    bool yFlipped() const {
-        return y() != pts()[0].fY;
-    }
+    bool yFlipped() const { return y() != pts()[0].fY; }
 
 private:
     SkOpSegment* fSegment;

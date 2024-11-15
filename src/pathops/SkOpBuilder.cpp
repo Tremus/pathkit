@@ -5,19 +5,19 @@
  * found in the LICENSE file.
  */
 
-#include "include/core/SkMatrix.h"
-#include "include/pathops/SkPathOps.h"
 #include "src/core/SkArenaAlloc.h"
+#include "src/core/SkMatrix.h"
 #include "src/core/SkPathPriv.h"
 #include "src/pathops/SkOpEdgeBuilder.h"
+#include "src/pathops/SkPathOps.h"
 #include "src/pathops/SkPathOpsCommon.h"
 
 namespace pk {
 static bool one_contour(const SkPath& path) {
     SkSTArenaAlloc<256> allocator;
     int verbCount = path.countVerbs();
-    uint8_t* verbs = (uint8_t*) allocator.makeArrayDefault<uint8_t>(verbCount);
-    (void) path.getVerbs(verbs, verbCount);
+    uint8_t* verbs = (uint8_t*)allocator.makeArrayDefault<uint8_t>(verbCount);
+    (void)path.getVerbs(verbs, verbCount);
     for (int index = 1; index < verbCount; ++index) {
         if (verbs[index] == SkPath::kMove_Verb) {
             return false;
@@ -55,8 +55,8 @@ bool SkOpBuilder::FixWinding(SkPath* path) {
     }
     SkSTArenaAlloc<4096> allocator;
     SkOpContourHead contourHead;
-    SkOpGlobalState globalState(&contourHead, &allocator  PkDEBUGPARAMS(false)
-            PkDEBUGPARAMS(nullptr));
+    SkOpGlobalState globalState(&contourHead,
+                                &allocator PkDEBUGPARAMS(false) PkDEBUGPARAMS(nullptr));
     SkOpEdgeBuilder builder(*path, &contourHead, &globalState);
     if (builder.unparseable() || !builder.finish()) {
         return false;
@@ -77,8 +77,11 @@ bool SkOpBuilder::FixWinding(SkPath* path) {
         SkOpContour* topContour = topSegment->contour();
         PkASSERT(topContour->isCcw() >= 0);
 #if DEBUG_WINDING
-        SkDebugf("%s id=%d nested=%d ccw=%d\n",  __FUNCTION__,
-                topSegment->debugID(), globalState.nested(), topContour->isCcw());
+        SkDebugf("%s id=%d nested=%d ccw=%d\n",
+                 __FUNCTION__,
+                 topSegment->debugID(),
+                 globalState.nested(),
+                 topContour->isCcw());
 #endif
         if ((globalState.nested() & 1) != SkToBool(topContour->isCcw())) {
             topContour->setReverse();

@@ -5,10 +5,10 @@
  * found in the LICENSE file.
  */
 
-#include "include/core/SkRect.h"
-#include "include/private/SkMalloc.h"
-#include "include/private/SkNx.h"
+#include "src/core/SkRect.h"
 #include "src/core/SkRectPriv.h"
+#include "src/private/SkMalloc.h"
+#include "src/private/SkNx.h"
 
 namespace pk {
 void SkRect::toQuad(SkPoint quad[4]) const {

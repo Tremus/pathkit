@@ -9,7 +9,7 @@
 #include "src/pathops/SkLineParameters.h"
 #include "src/pathops/SkPathOpsCurve.h"
 #if DEBUG_ANGLE
-#include "include/core/SkString.h"
+#include "src/core/SkString.h"
 #endif
 
 namespace pk {
@@ -32,9 +32,7 @@ public:
     const SkOpCoincidence* debugCoincidence() const;
     SkOpContour* debugContour(int id) const;
 
-    int debugID() const {
-        return PkDEBUGRELEASE(fID, -1);
-    }
+    int debugID() const { return PkDEBUGRELEASE(fID, -1); }
 
 #if DEBUG_SORT
     void debugLoop() const;
@@ -57,60 +55,50 @@ public:
     void dumpCurves() const;
     void dumpLoop() const;
     void dumpOne(bool functionHeader) const;
-    void dumpTo(const SkOpSegment* fromSeg, const SkOpAngle* ) const;
+    void dumpTo(const SkOpSegment* fromSeg, const SkOpAngle*) const;
     void dumpTest() const;
 
-    SkOpSpanBase* end() const {
-        return fEnd;
-    }
+    SkOpSpanBase* end() const { return fEnd; }
 
-    bool insert(SkOpAngle* );
+    bool insert(SkOpAngle*);
     SkOpSpanBase* lastMarked() const;
-    bool loopContains(const SkOpAngle* ) const;
+    bool loopContains(const SkOpAngle*) const;
     int loopCount() const;
 
-    SkOpAngle* next() const {
-        return fNext;
-    }
+    SkOpAngle* next() const { return fNext; }
 
     SkOpAngle* previous() const;
     SkOpSegment* segment() const;
     void set(SkOpSpanBase* start, SkOpSpanBase* end);
 
-    void setLastMarked(SkOpSpanBase* marked) {
-        fLastMarked = marked;
-    }
+    void setLastMarked(SkOpSpanBase* marked) { fLastMarked = marked; }
 
-    SkOpSpanBase* start() const {
-        return fStart;
-    }
+    SkOpSpanBase* start() const { return fStart; }
 
     SkOpSpan* starter();
 
-    bool tangentsAmbiguous() const {
-        return fTangentsAmbiguous;
-    }
+    bool tangentsAmbiguous() const { return fTangentsAmbiguous; }
 
-    bool unorderable() const {
-        return fUnorderable;
-    }
+    bool unorderable() const { return fUnorderable; }
 
 private:
     bool after(SkOpAngle* test);
     void alignmentSameSide(const SkOpAngle* test, int* order) const;
     bool checkCrossesZero() const;
-    bool checkParallel(SkOpAngle* );
+    bool checkParallel(SkOpAngle*);
     bool computeSector();
-    int convexHullOverlaps(const SkOpAngle* );
+    int convexHullOverlaps(const SkOpAngle*);
     bool endToSide(const SkOpAngle* rh, bool* inside) const;
-    bool endsIntersect(SkOpAngle* );
+    bool endsIntersect(SkOpAngle*);
     int findSector(SkPath::Verb verb, double x, double y) const;
     SkOpGlobalState* globalState() const;
-    int lineOnOneSide(const SkDPoint& origin, const SkDVector& line, const SkOpAngle* test,
+    int lineOnOneSide(const SkDPoint& origin,
+                      const SkDVector& line,
+                      const SkOpAngle* test,
                       bool useOriginal) const;
     int lineOnOneSide(const SkOpAngle* test, bool useOriginal);
     int linesOnOriginalSide(const SkOpAngle* test);
-    bool merge(SkOpAngle* );
+    bool merge(SkOpAngle*);
     double midT() const;
     bool midToSide(const SkOpAngle* rh, bool* inside) const;
     bool oppositePlanes(const SkOpAngle* rh) const;
@@ -120,7 +108,7 @@ private:
     bool tangentsDiverge(const SkOpAngle* rh, double s0xt0);
 
     SkDCurve fOriginalCurvePart;  // the curve from start to end
-    SkDCurveSweep fPart;  // the curve from start to end offset as needed
+    SkDCurveSweep fPart;          // the curve from start to end offset as needed
     double fSide;
     SkLineParameters fTangentHalf;  // used only to sort a pair of lines or line-like sections
     SkOpAngle* fNext;

@@ -8,9 +8,9 @@
 #ifndef GrTriangulator_DEFINED
 #define GrTriangulator_DEFINED
 
-#include "include/core/SkPath.h"
-#include "include/core/SkPoint.h"
 #include "src/core/SkArenaAlloc.h"
+#include "src/core/SkPath.h"
+#include "src/core/SkPoint.h"
 
 namespace pk {
 struct SkRect;

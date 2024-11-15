@@ -6,8 +6,8 @@
  */
 #pragma once
 
-#include "include/private/SkTDArray.h"
 #include "src/pathops/SkOpSegment.h"
+#include "src/private/SkTDArray.h"
 
 namespace pk {
 enum class SkOpRayDir;
@@ -16,36 +16,27 @@ class SkPathWriter;
 
 class SkOpContour {
 public:
-    SkOpContour() {
-        reset();
-    }
+    SkOpContour() { reset(); }
 
     bool operator<(const SkOpContour& rh) const {
-        return fBounds.fTop == rh.fBounds.fTop
-            ? fBounds.fLeft < rh.fBounds.fLeft
-            : fBounds.fTop < rh.fBounds.fTop;
+        return fBounds.fTop == rh.fBounds.fTop ? fBounds.fLeft < rh.fBounds.fLeft
+                                               : fBounds.fTop < rh.fBounds.fTop;
     }
 
-    void addConic(SkPoint pts[3], SkScalar weight) {
-        appendSegment().addConic(pts, weight, this);
-    }
+    void addConic(SkPoint pts[3], SkScalar weight) { appendSegment().addConic(pts, weight, this); }
 
-    void addCubic(SkPoint pts[4]) {
-        appendSegment().addCubic(pts, this);
-    }
+    void addCubic(SkPoint pts[4]) { appendSegment().addCubic(pts, this); }
 
     SkOpSegment* addLine(SkPoint pts[2]) {
         PkASSERT(pts[0] != pts[1]);
         return appendSegment().addLine(pts, this);
     }
 
-    void addQuad(SkPoint pts[3]) {
-        appendSegment().addQuad(pts, this);
-    }
+    void addQuad(SkPoint pts[3]) { appendSegment().addQuad(pts, this); }
 
     SkOpSegment& appendSegment() {
-        SkOpSegment* result = fCount++ ? this->globalState()->allocator()->make<SkOpSegment>()
-                                       : &fHead;
+        SkOpSegment* result =
+                fCount++ ? this->globalState()->allocator()->make<SkOpSegment>() : &fHead;
         result->setPrev(fTail);
         if (fTail) {
             fTail->setNext(result);
@@ -54,9 +45,7 @@ public:
         return *result;
     }
 
-    const SkPathOpsBounds& bounds() const {
-        return fBounds;
-    }
+    const SkPathOpsBounds& bounds() const { return fBounds; }
 
     void calcAngles() {
         PkASSERT(fCount > 0);
@@ -66,33 +55,22 @@ public:
         } while ((segment = segment->next()));
     }
 
-    void complete() {
-        setBounds();
-    }
+    void complete() { setBounds(); }
 
-    int count() const {
-        return fCount;
-    }
+    int count() const { return fCount; }
 
-    int debugID() const {
-        return PkDEBUGRELEASE(fID, -1);
-    }
+    int debugID() const { return PkDEBUGRELEASE(fID, -1); }
 
-    int debugIndent() const {
-        return PkDEBUGRELEASE(fDebugIndent, 0);
-    }
-
+    int debugIndent() const { return PkDEBUGRELEASE(fDebugIndent, 0); }
 
     const SkOpAngle* debugAngle(int id) const {
         return PkDEBUGRELEASE(this->globalState()->debugAngle(id), nullptr);
     }
 
-    const SkOpCoincidence* debugCoincidence() const {
-        return this->globalState()->coincidence();
-    }
+    const SkOpCoincidence* debugCoincidence() const { return this->globalState()->coincidence(); }
 
 #if DEBUG_COIN
-    void debugCheckHealth(SkPathOpsDebug::GlitchLog* ) const;
+    void debugCheckHealth(SkPathOpsDebug::GlitchLog*) const;
 #endif
 
     SkOpContour* debugContour(int id) const {
@@ -101,7 +79,7 @@ public:
 
 #if DEBUG_COIN
     void debugMissingCoincidence(SkPathOpsDebug::GlitchLog* log) const;
-    void debugMoveMultiples(SkPathOpsDebug::GlitchLog* ) const;
+    void debugMoveMultiples(SkPathOpsDebug::GlitchLog*) const;
     void debugMoveNearby(SkPathOpsDebug::GlitchLog* log) const;
 #endif
 
@@ -126,9 +104,7 @@ public:
         return PkDEBUGRELEASE(this->globalState()->debugSpan(id), nullptr);
     }
 
-    SkOpGlobalState* globalState() const {
-        return fState;
-    }
+    SkOpGlobalState* globalState() const { return fState; }
 
     void debugValidate() const {
 #if DEBUG_VALIDATE
@@ -143,9 +119,7 @@ public:
 #endif
     }
 
-    bool done() const {
-        return fDone;
-    }
+    bool done() const { return fDone; }
 
     void dump() const;
     void dumpAll() const;
@@ -158,19 +132,17 @@ public:
     void dumpContoursSegment(int segmentID) const;
     void dumpContoursSpan(int segmentID) const;
     void dumpContoursSpans() const;
-    void dumpPt(int ) const;
+    void dumpPt(int) const;
     void dumpPts(const char* prefix = "seg") const;
     void dumpPtsX(const char* prefix) const;
-    void dumpSegment(int ) const;
-    void dumpSegments(const char* prefix = "seg", SkPathOp op = (SkPathOp) -1) const;
-    void dumpSpan(int ) const;
+    void dumpSegment(int) const;
+    void dumpSegments(const char* prefix = "seg", SkPathOp op = (SkPathOp)-1) const;
+    void dumpSpan(int) const;
     void dumpSpans() const;
 
-    const SkPoint& end() const {
-        return fTail->pts()[SkPathOpsVerbToPoints(fTail->verb())];
-    }
+    const SkPoint& end() const { return fTail->pts()[SkPathOpsVerbToPoints(fTail->verb())]; }
 
-    SkOpSpan* findSortableTop(SkOpContour* );
+    SkOpSpan* findSortableTop(SkOpContour*);
 
     SkOpSegment* first() {
         PkASSERT(fCount > 0);
@@ -182,9 +154,7 @@ public:
         return &fHead;
     }
 
-    void indentDump() const {
-        PkDEBUGCODE(fDebugIndent += 2);
-    }
+    void indentDump() const { PkDEBUGCODE(fDebugIndent += 2); }
 
     void init(SkOpGlobalState* globalState, bool operand, bool isXor) {
         fState = globalState;
@@ -193,13 +163,9 @@ public:
         PkDEBUGCODE(fID = globalState->nextContourID());
     }
 
-    int isCcw() const {
-        return fCcw;
-    }
+    int isCcw() const { return fCcw; }
 
-    bool isXor() const {
-        return fXor;
-    }
+    bool isXor() const { return fXor; }
 
     void joinSegments() {
         SkOpSegment* segment = &fHead;
@@ -253,25 +219,15 @@ public:
         return true;
     }
 
-    SkOpContour* next() {
-        return fNext;
-    }
+    SkOpContour* next() { return fNext; }
 
-    const SkOpContour* next() const {
-        return fNext;
-    }
+    const SkOpContour* next() const { return fNext; }
 
-    bool operand() const {
-        return fOperand;
-    }
+    bool operand() const { return fOperand; }
 
-    bool oppXor() const {
-        return fOppXor;
-    }
+    bool oppXor() const { return fOppXor; }
 
-    void outdentDump() const {
-        PkDEBUGCODE(fDebugIndent -= 2);
-    }
+    void outdentDump() const { PkDEBUGCODE(fDebugIndent -= 2); }
 
     void rayCheck(const SkOpRayHit& base, SkOpRayDir dir, SkOpRayHit** hits, SkArenaAlloc*);
 
@@ -296,9 +252,7 @@ public:
         } while ((next = next->next()));
     }
 
-    bool reversed() const {
-        return fReverse;
-    }
+    bool reversed() const { return fReverse; }
 
     void setBounds() {
         PkASSERT(fCount > 0);
@@ -309,34 +263,22 @@ public:
         }
     }
 
-    void setCcw(int ccw) {
-        fCcw = ccw;
-    }
+    void setCcw(int ccw) { fCcw = ccw; }
 
-    void setGlobalState(SkOpGlobalState* state) {
-        fState = state;
-    }
+    void setGlobalState(SkOpGlobalState* state) { fState = state; }
 
     void setNext(SkOpContour* contour) {
-//        PkASSERT(!fNext == !!contour);
+        //        PkASSERT(!fNext == !!contour);
         fNext = contour;
     }
 
-    void setOperand(bool isOp) {
-        fOperand = isOp;
-    }
+    void setOperand(bool isOp) { fOperand = isOp; }
 
-    void setOppXor(bool isOppXor) {
-        fOppXor = isOppXor;
-    }
+    void setOppXor(bool isOppXor) { fOppXor = isOppXor; }
 
-    void setReverse() {
-        fReverse = true;
-    }
+    void setReverse() { fReverse = true; }
 
-    void setXor(bool isXor) {
-        fXor = isXor;
-    }
+    void setXor(bool isXor) { fXor = isXor; }
 
     bool sortAngles() {
         PkASSERT(fCount > 0);
@@ -347,9 +289,7 @@ public:
         return true;
     }
 
-    const SkPoint& start() const {
-        return fHead.pts()[0];
-    }
+    const SkPoint& start() const { return fHead.pts()[0]; }
 
     void toPartialBackward(SkPathWriter* path) const {
         const SkOpSegment* segment = fTail;
@@ -378,11 +318,11 @@ protected:
     int fCcw;
     int fCount;
     int fFirstSorted;
-    bool fDone;  // set by find top segment
+    bool fDone;     // set by find top segment
     bool fOperand;  // true for the second argument to a binary operator
     bool fReverse;  // true if contour should be reverse written to path (used only by fix winding)
-    bool fXor;  // set if original path had even-odd fill
-    bool fOppXor;  // set if opposite path had even-odd fill
+    bool fXor;      // set if original path had even-odd fill
+    bool fOppXor;   // set if opposite path had even-odd fill
     PkDEBUGCODE(int fID);
     PkDEBUGCODE(mutable int fDebugIndent);
 };
@@ -426,15 +366,11 @@ public:
         PkASSERT(prev);
         prev->setNext(nullptr);
     }
-
 };
 
 class SkOpContourBuilder {
 public:
-    SkOpContourBuilder(SkOpContour* contour)
-        : fContour(contour)
-        , fLastIsLine(false) {
-    }
+    SkOpContourBuilder(SkOpContour* contour) : fContour(contour), fLastIsLine(false) {}
 
     void addConic(SkPoint pts[3], SkScalar weight);
     void addCubic(SkPoint pts[4]);
@@ -443,7 +379,11 @@ public:
     void addQuad(SkPoint pts[3]);
     void flush();
     SkOpContour* contour() { return fContour; }
-    void setContour(SkOpContour* contour) { flush(); fContour = contour; }
+    void setContour(SkOpContour* contour) {
+        flush();
+        fContour = contour;
+    }
+
 protected:
     SkOpContour* fContour;
     SkPoint fLastLine[2];

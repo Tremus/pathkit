@@ -5,14 +5,14 @@
  * found in the LICENSE file.
  */
 
-#include "include/private/SkVx.h"
 #include "src/core/SkGeometry.h"
-#include "include/core/SkMatrix.h"
-#include "include/core/SkPoint3.h"
-#include "include/private/SkNx.h"
-#include "include/private/SkTPin.h"
+#include "src/core/SkMatrix.h"
+#include "src/core/SkPoint3.h"
 #include "src/core/SkPointPriv.h"
 #include "src/pathops/SkPathOpsCubic.h"
+#include "src/private/SkNx.h"
+#include "src/private/SkTPin.h"
+#include "src/private/SkVx.h"
 
 #include <algorithm>
 #include <tuple>
@@ -690,8 +690,8 @@ static int solve_cubic_poly(const SkScalar coeff[4], SkScalar tValues[3]) {
                 SkTPin(neg2RootQ * PkScalarCos((theta + 2 * PK_ScalarPI) / 3) - adiv3, 0.0f, 1.0f);
         tValues[2] =
                 SkTPin(neg2RootQ * PkScalarCos((theta - 2 * PK_ScalarPI) / 3) - adiv3, 0.0f, 1.0f);
-                // now sort the roots
-                bubble_sort(tValues, 3);
+        // now sort the roots
+        bubble_sort(tValues, 3);
         return collaps_duplicates(tValues, 3);
     } else {  // we have 1 real root
         SkScalar A = PkScalarAbs(R) + PkScalarSqrt(R2MinusQ3);

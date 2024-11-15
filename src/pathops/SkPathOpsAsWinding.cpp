@@ -4,12 +4,12 @@
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  */
-#include "include/core/SkRect.h"
-#include "src/core/SkPathPriv.h"
-#include "src/pathops/SkOpEdgeBuilder.h"
-#include "src/pathops/SkPathOpsCommon.h"
 #include <algorithm>
 #include <vector>
+#include "src/core/SkPathPriv.h"
+#include "src/core/SkRect.h"
+#include "src/pathops/SkOpEdgeBuilder.h"
+#include "src/pathops/SkPathOpsCommon.h"
 
 namespace pk {
 using std::vector;
@@ -22,10 +22,7 @@ struct Contour {
     };
 
     Contour(const SkRect& bounds, int lastStart, int verbStart)
-        : fBounds(bounds)
-        , fVerbStart(lastStart)
-        , fVerbEnd(verbStart) {
-    }
+            : fBounds(bounds), fVerbStart(lastStart), fVerbEnd(verbStart) {}
 
     vector<Contour*> fChildren;
     const SkRect fBounds;
@@ -37,12 +34,13 @@ struct Contour {
     bool fReverse{false};
 };
 
-static const int kPtCount[] = { 1, 1, 2, 2, 3, 0 };
-static const int kPtIndex[] = { 0, 1, 1, 1, 1, 0 };
+static const int kPtCount[] = {1, 1, 2, 2, 3, 0};
+static const int kPtIndex[] = {0, 1, 1, 1, 1, 0};
 
 static Contour::Direction to_direction(SkScalar dy) {
-    return dy > 0 ? Contour::Direction::kCCW : dy < 0 ? Contour::Direction::kCW :
-            Contour::Direction::kNone;
+    return dy > 0   ? Contour::Direction::kCCW
+           : dy < 0 ? Contour::Direction::kCW
+                    : Contour::Direction::kNone;
 }
 
 static int contains_edge(SkPoint pts[4], SkPath::Verb verb, SkScalar weight, const SkPoint& edge) {
@@ -64,7 +62,7 @@ static int contains_edge(SkPoint pts[4], SkPath::Verb verb, SkScalar weight, con
     int count = (*CurveIntercept[verb * 2])(pts, weight, edge.fY, tVals);
     PkASSERT(between(0, count, 3));
     // remove results to the right of edge
-    for (int index = 0; index < count; ) {
+    for (int index = 0; index < count;) {
         SkScalar intersectX = (*CurvePointAtT[verb])(pts, weight, tVals[index]).fX;
         if (intersectX < edge.fX) {
             ++index;
@@ -93,7 +91,7 @@ static int contains_edge(SkPoint pts[4], SkPath::Verb verb, SkScalar weight, con
         if (zero_or_one(tVals[index]) && Contour::Direction::kCCW != directions[index]) {
             continue;
         }
-        winding += (int) directions[index];
+        winding += (int)directions[index];
     }
     return winding;  // note winding indicates containership, not contour direction
 }
@@ -102,8 +100,10 @@ static SkScalar conic_weight(const SkPath::Iter& iter, SkPath::Verb verb) {
     return SkPath::kConic_Verb == verb ? iter.conicWeight() : 1;
 }
 
-static SkPoint left_edge(SkPoint pts[4], SkPath::Verb verb, SkScalar weight,
-        Contour::Direction* direction) {
+static SkPoint left_edge(SkPoint pts[4],
+                         SkPath::Verb verb,
+                         SkScalar weight,
+                         Contour::Direction* direction) {
     PkASSERT(SkPath::kLine_Verb <= verb && verb <= SkPath::kCubic_Verb);
     SkPoint result;
     double dy;
@@ -173,9 +173,7 @@ public:
         kCompare,
     };
 
-    OpAsWinding(const SkPath& path)
-        : fPath(path) {
-    }
+    OpAsWinding(const SkPath& path) : fPath(path) {}
 
     void contourBounds(vector<Contour>* containers) {
         SkRect bounds;
@@ -189,8 +187,8 @@ public:
                 if (!bounds.isEmpty()) {
                     containers->emplace_back(bounds, lastStart, verbStart);
                     lastStart = verbStart;
-               }
-               bounds.setBounds(&pts[kPtIndex[SkPath::kMove_Verb]], kPtCount[SkPath::kMove_Verb]);
+                }
+                bounds.setBounds(&pts[kPtIndex[SkPath::kMove_Verb]], kPtCount[SkPath::kMove_Verb]);
             }
             if (SkPathVerb::kLine <= verb && verb <= SkPathVerb::kCubic) {
                 SkRect verbBounds;
@@ -264,7 +262,7 @@ public:
         // find outside point on lesser contour
         // arbitrarily, choose non-horizontal edge where point <= bounds left
         // note that if leftmost point is control point, may need tight bounds
-            // to find edge with minimum-x
+        // to find edge with minimum-x
         if (PK_ScalarMax == test.fMinXY.fX) {
             this->nextEdge(test, Edge::kInitial);
         }
@@ -286,7 +284,7 @@ public:
             }
         }
         // move parent's children into contour's children if contained by contour
-        for (auto iter = parent.fChildren.begin(); iter != parent.fChildren.end(); ) {
+        for (auto iter = parent.fChildren.begin(); iter != parent.fChildren.end();) {
             if (contour.fBounds.contains((*iter)->fBounds)) {
                 contour.fChildren.push_back(*iter);
                 iter = parent.fChildren.erase(iter);
@@ -318,7 +316,7 @@ public:
         }
         if (parent && parent->fDirection == child->fDirection) {
             child->fReverse = true;
-            child->fDirection = (Contour::Direction) -(int) child->fDirection;
+            child->fDirection = (Contour::Direction) - (int)child->fDirection;
             return true;
         }
         return reversed;
@@ -382,17 +380,16 @@ bool AsWinding(const SkPath& path, SkPath* result) {
         return false;
     }
     SkPathFillType fillType = path.getFillType();
-    if (fillType == SkPathFillType::kWinding
-            || fillType == SkPathFillType::kInverseWinding ) {
+    if (fillType == SkPathFillType::kWinding || fillType == SkPathFillType::kInverseWinding) {
         return set_result_path(result, path, fillType);
     }
-    fillType = path.isInverseFillType() ? SkPathFillType::kInverseWinding :
-            SkPathFillType::kWinding;
+    fillType =
+            path.isInverseFillType() ? SkPathFillType::kInverseWinding : SkPathFillType::kWinding;
     if (path.isEmpty() || path.isConvex()) {
         return set_result_path(result, path, fillType);
     }
     // count contours
-    vector<Contour> contours;   // one per contour
+    vector<Contour> contours;  // one per contour
     OpAsWinding winder(path);
     winder.contourBounds(&contours);
     if (contours.size() <= 1) {
@@ -404,8 +401,9 @@ bool AsWinding(const SkPath& path, SkPath* result) {
         winder.inParent(contour, sorted);
     }
     // if sorted has no grandchildren, no child has to fix its children's winding
-    if (std::all_of(sorted.fChildren.begin(), sorted.fChildren.end(),
-            [](const Contour* contour) -> bool { return !contour->fChildren.size(); } )) {
+    if (std::all_of(sorted.fChildren.begin(),
+                    sorted.fChildren.end(),
+                    [](const Contour* contour) -> bool { return !contour->fChildren.size(); })) {
         return set_result_path(result, path, fillType);
     }
     // starting with outermost and moving inward, see if one path contains another

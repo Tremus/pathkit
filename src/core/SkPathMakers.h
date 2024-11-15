@@ -7,30 +7,27 @@
 
 #pragma once
 
-#include "include/core/SkPathTypes.h"
-#include "include/core/SkPoint.h"
-#include "include/core/SkRRect.h"
+#include "src/core/SkPathTypes.h"
+#include "src/core/SkPoint.h"
+#include "src/core/SkRRect.h"
 
 namespace pk {
 template <unsigned N> class SkPath_PointIterator {
 public:
     SkPath_PointIterator(SkPathDirection dir, unsigned startIndex)
-    : fCurrent(startIndex % N)
-    , fAdvance(dir == SkPathDirection::kCW ? 1 : N - 1) { }
+            : fCurrent(startIndex % N), fAdvance(dir == SkPathDirection::kCW ? 1 : N - 1) {}
 
-    const SkPoint& current() const {
-        return fPts[fCurrent];
-    }
+    const SkPoint& current() const { return fPts[fCurrent]; }
 
     const SkPoint& next() {
         fCurrent = (fCurrent + fAdvance) % N;
         return this->current();
     }
 
-    protected:
+protected:
     SkPoint fPts[N];
 
-    private:
+private:
     unsigned fCurrent;
     unsigned fAdvance;
 };
@@ -38,8 +35,7 @@ public:
 class SkPath_RectPointIterator : public SkPath_PointIterator<4> {
 public:
     SkPath_RectPointIterator(const SkRect& rect, SkPathDirection dir, unsigned startIndex)
-        : SkPath_PointIterator(dir, startIndex) {
-
+            : SkPath_PointIterator(dir, startIndex) {
         fPts[0] = SkPoint::Make(rect.fLeft, rect.fTop);
         fPts[1] = SkPoint::Make(rect.fRight, rect.fTop);
         fPts[2] = SkPoint::Make(rect.fRight, rect.fBottom);
@@ -50,8 +46,7 @@ public:
 class SkPath_OvalPointIterator : public SkPath_PointIterator<4> {
 public:
     SkPath_OvalPointIterator(const SkRect& oval, SkPathDirection dir, unsigned startIndex)
-        : SkPath_PointIterator(dir, startIndex) {
-
+            : SkPath_PointIterator(dir, startIndex) {
         const SkScalar cx = oval.centerX();
         const SkScalar cy = oval.centerY();
 
@@ -65,8 +60,7 @@ public:
 class SkPath_RRectPointIterator : public SkPath_PointIterator<8> {
 public:
     SkPath_RRectPointIterator(const SkRRect& rrect, SkPathDirection dir, unsigned startIndex)
-        : SkPath_PointIterator(dir, startIndex) {
-
+            : SkPath_PointIterator(dir, startIndex) {
         const SkRect& bounds = rrect.getBounds();
         const SkScalar L = bounds.fLeft;
         const SkScalar T = bounds.fTop;

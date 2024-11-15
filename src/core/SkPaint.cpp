@@ -5,14 +5,14 @@
  * found in the LICENSE file.
  */
 
-#include "include/core/SkPaint.h"
+#include "src/core/SkPaint.h"
 
-#include "include/core/SkPathEffect.h"
-#include "include/core/SkScalar.h"
-#include "include/core/SkStrokeRec.h"
-#include "include/private/SkTo.h"
 #include "src/core/SkPaintDefaults.h"
 #include "src/core/SkPaintPriv.h"
+#include "src/core/SkPathEffect.h"
+#include "src/core/SkScalar.h"
+#include "src/core/SkStrokeRec.h"
+#include "src/private/SkTo.h"
 
 namespace pk {
 SkPaint::SkPaint()

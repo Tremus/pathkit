@@ -8,7 +8,7 @@
 #ifndef GrWangsFormula_DEFINED
 #define GrWangsFormula_DEFINED
 
-#include "include/core/SkPoint.h"
+#include "src/core/SkPoint.h"
 #include "src/gpu/GrVx.h"
 #include "src/gpu/tessellate/GrVectorXform.h"
 

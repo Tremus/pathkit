@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "include/core/SkPath.h"
-#include "include/core/SkPoint.h"
 #include "src/core/SkGeometry.h"
+#include "src/core/SkPath.h"
+#include "src/core/SkPoint.h"
 
 namespace pk {
 // Used in the Segment struct defined in SkPathMeasure.h

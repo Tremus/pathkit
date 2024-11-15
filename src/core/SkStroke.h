@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "include/core/SkPaint.h"
-#include "include/core/SkPath.h"
-#include "include/core/SkPoint.h"
-#include "include/private/SkTo.h"
+#include "src/core/SkPaint.h"
+#include "src/core/SkPath.h"
+#include "src/core/SkPoint.h"
 #include "src/core/SkStrokerPriv.h"
+#include "src/private/SkTo.h"
 
 namespace pk {
 /** \class SkStroke
@@ -24,17 +24,17 @@ class SkStroke {
 public:
     SkStroke();
 
-    SkPaint::Cap    getCap() const { return (SkPaint::Cap)fCap; }
-    void        setCap(SkPaint::Cap);
+    SkPaint::Cap getCap() const { return (SkPaint::Cap)fCap; }
+    void setCap(SkPaint::Cap);
 
-    SkPaint::Join   getJoin() const { return (SkPaint::Join)fJoin; }
-    void        setJoin(SkPaint::Join);
+    SkPaint::Join getJoin() const { return (SkPaint::Join)fJoin; }
+    void setJoin(SkPaint::Join);
 
-    void    setMiterLimit(SkScalar);
-    void    setWidth(SkScalar);
+    void setMiterLimit(SkScalar);
+    void setWidth(SkScalar);
 
-    bool    getDoFill() const { return SkToBool(fDoFill); }
-    void    setDoFill(bool doFill) { fDoFill = SkToU8(doFill); }
+    bool getDoFill() const { return SkToBool(fDoFill); }
+    void setDoFill(bool doFill) { fDoFill = SkToU8(doFill); }
 
     /**
      *  ResScale is the "intended" resolution for the output.
@@ -45,24 +45,23 @@ public:
      *          be zoomed down, and small errors may be invisible.
      */
     SkScalar getResScale() const { return fResScale; }
-    void setResScale(SkScalar rs) {
-        fResScale = rs;
-    }
+    void setResScale(SkScalar rs) { fResScale = rs; }
 
     /**
      *  Stroke the specified rect, winding it in the specified direction..
      */
-    void    strokeRect(const SkRect& rect, SkPath* result,
-                       SkPathDirection = SkPathDirection::kCW) const;
-    void    strokePath(const SkPath& path, SkPath*) const;
+    void strokeRect(const SkRect& rect,
+                    SkPath* result,
+                    SkPathDirection = SkPathDirection::kCW) const;
+    void strokePath(const SkPath& path, SkPath*) const;
 
     ////////////////////////////////////////////////////////////////
 
 private:
-    SkScalar    fWidth, fMiterLimit;
-    SkScalar    fResScale;
-    uint8_t     fCap, fJoin;
-    bool        fDoFill;
+    SkScalar fWidth, fMiterLimit;
+    SkScalar fResScale;
+    uint8_t fCap, fJoin;
+    bool fDoFill;
 
     friend class SkPaint;
 };

@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "include/core/SkPoint.h"
+#include "src/core/SkPoint.h"
 #include "src/pathops/SkPathOpsDebug.h"
 #include "src/pathops/SkPathOpsTypes.h"
 
@@ -23,10 +23,7 @@ struct SkPathOpsBounds;
 // subset of op span used by terminal span (when t is equal to one)
 class SkOpPtT {
 public:
-    enum {
-        kIsAlias = 1,
-        kIsDuplicate = 1
-    };
+    enum { kIsAlias = 1, kIsDuplicate = 1 };
 
     const SkOpPtT* active() const;
 
@@ -41,20 +38,18 @@ public:
 
     bool alias() const;
     bool coincident() const { return fCoincident; }
-    bool contains(const SkOpPtT* ) const;
-    bool contains(const SkOpSegment*, const SkPoint& ) const;
+    bool contains(const SkOpPtT*) const;
+    bool contains(const SkOpSegment*, const SkPoint&) const;
     bool contains(const SkOpSegment*, double t) const;
-    const SkOpPtT* contains(const SkOpSegment* ) const;
+    const SkOpPtT* contains(const SkOpSegment*) const;
     SkOpContour* contour() const;
 
-    int debugID() const {
-        return PkDEBUGRELEASE(fID, -1);
-    }
+    int debugID() const { return PkDEBUGRELEASE(fID, -1); }
 
     void debugAddOpp(const SkOpPtT* opp, const SkOpPtT* oppPrev) const;
     const SkOpAngle* debugAngle(int id) const;
     const SkOpCoincidence* debugCoincidence() const;
-    bool debugContains(const SkOpPtT* ) const;
+    bool debugContains(const SkOpPtT*) const;
     const SkOpPtT* debugContains(const SkOpSegment* check) const;
     SkOpContour* debugContour(int id) const;
     const SkOpPtT* debugEnder(const SkOpPtT* end) const;
@@ -64,25 +59,21 @@ public:
     const SkOpPtT* debugPtT(int id) const;
     void debugResetCoinT() const;
     const SkOpSegment* debugSegment(int id) const;
-    void debugSetCoinT(int ) const;
+    void debugSetCoinT(int) const;
     const SkOpSpanBase* debugSpan(int id) const;
     void debugValidate() const;
 
-    bool deleted() const {
-        return fDeleted;
-    }
+    bool deleted() const { return fDeleted; }
 
-    bool duplicate() const {
-        return fDuplicatePt;
-    }
+    bool duplicate() const { return fDuplicatePt; }
 
     void dump() const;  // available to testing only
     void dumpAll() const;
     void dumpBase() const;
 
-    const SkOpPtT* find(const SkOpSegment* ) const;
+    const SkOpPtT* find(const SkOpSegment*) const;
     SkOpGlobalState* globalState() const;
-    void init(SkOpSpanBase* , double t, const SkPoint& , bool dup);
+    void init(SkOpSpanBase*, double t, const SkPoint&, bool dup);
 
     void insert(SkOpPtT* span) {
         PkASSERT(span != this);
@@ -90,13 +81,9 @@ public:
         fNext = span;
     }
 
-    const SkOpPtT* next() const {
-        return fNext;
-    }
+    const SkOpPtT* next() const { return fNext; }
 
-    SkOpPtT* next() {
-        return fNext;
-    }
+    SkOpPtT* next() { return fNext; }
 
     bool onEnd() const;
 
@@ -116,16 +103,22 @@ public:
         return oppPrev;
     }
 
-    static bool Overlaps(const SkOpPtT* s1, const SkOpPtT* e1, const SkOpPtT* s2,
-            const SkOpPtT* e2, const SkOpPtT** sOut, const SkOpPtT** eOut) {
+    static bool Overlaps(const SkOpPtT* s1,
+                         const SkOpPtT* e1,
+                         const SkOpPtT* s2,
+                         const SkOpPtT* e2,
+                         const SkOpPtT** sOut,
+                         const SkOpPtT** eOut) {
         const SkOpPtT* start1 = s1->fT < e1->fT ? s1 : e1;
         const SkOpPtT* start2 = s2->fT < e2->fT ? s2 : e2;
-        *sOut = between(s1->fT, start2->fT, e1->fT) ? start2
-                : between(s2->fT, start1->fT, e2->fT) ? start1 : nullptr;
+        *sOut = between(s1->fT, start2->fT, e1->fT)   ? start2
+                : between(s2->fT, start1->fT, e2->fT) ? start1
+                                                      : nullptr;
         const SkOpPtT* end1 = s1->fT < e1->fT ? e1 : s1;
         const SkOpPtT* end2 = s2->fT < e2->fT ? e2 : s2;
-        *eOut = between(s1->fT, end2->fT, e1->fT) ? end2
-                : between(s2->fT, end1->fT, e2->fT) ? end1 : nullptr;
+        *eOut = between(s1->fT, end2->fT, e1->fT)   ? end2
+                : between(s2->fT, end1->fT, e2->fT) ? end1
+                                                    : nullptr;
         if (*sOut == *eOut) {
             PkOPOBJASSERT(s1, start1->fT >= end2->fT || start2->fT >= end1->fT);
             return false;
@@ -147,29 +140,21 @@ public:
 
     void setDeleted();
 
-    void setSpan(const SkOpSpanBase* span) {
-        fSpan = const_cast<SkOpSpanBase*>(span);
-    }
+    void setSpan(const SkOpSpanBase* span) { fSpan = const_cast<SkOpSpanBase*>(span); }
 
-    const SkOpSpanBase* span() const {
-        return fSpan;
-    }
+    const SkOpSpanBase* span() const { return fSpan; }
 
-    SkOpSpanBase* span() {
-        return fSpan;
-    }
+    SkOpSpanBase* span() { return fSpan; }
 
-    const SkOpPtT* starter(const SkOpPtT* end) const {
-        return fT < end->fT ? this : end;
-    }
+    const SkOpPtT* starter(const SkOpPtT* end) const { return fT < end->fT ? this : end; }
 
     double fT;
-    SkPoint fPt;   // cache of point value at this t
+    SkPoint fPt;  // cache of point value at this t
 protected:
     SkOpSpanBase* fSpan;  // contains winding data
-    SkOpPtT* fNext;  // intersection on opposite curve or alias on this curve
-    bool fDeleted;  // set if removed from span list
-    bool fDuplicatePt;  // set if identical pt is somewhere in the next loop
+    SkOpPtT* fNext;       // intersection on opposite curve or alias on this curve
+    bool fDeleted;        // set if removed from span list
+    bool fDuplicatePt;    // set if identical pt is somewhere in the next loop
     // below mutable since referrer is otherwise always const
     mutable bool fCoincident;  // set if at some point a coincident span pointed here
     PkDEBUGCODE(int fID);
@@ -185,23 +170,17 @@ public:
 
     bool addOpp(SkOpSpanBase* opp);
 
-    void bumpSpanAdds() {
-        ++fSpanAdds;
-    }
+    void bumpSpanAdds() { ++fSpanAdds; }
 
-    bool chased() const {
-        return fChased;
-    }
+    bool chased() const { return fChased; }
 
     void checkForCollapsedCoincidence();
 
-    const SkOpSpanBase* coinEnd() const {
-        return fCoinEnd;
-    }
+    const SkOpSpanBase* coinEnd() const { return fCoinEnd; }
 
     Collapsed collapsed(double s, double e) const;
-    bool contains(const SkOpSpanBase* ) const;
-    const SkOpPtT* contains(const SkOpSegment* ) const;
+    bool contains(const SkOpSpanBase*) const;
+    const SkOpPtT* contains(const SkOpSegment*) const;
 
     bool containsCoinEnd(const SkOpSpanBase* coin) const {
         PkASSERT(this != coin);
@@ -214,25 +193,21 @@ public:
         return false;
     }
 
-    bool containsCoinEnd(const SkOpSegment* ) const;
+    bool containsCoinEnd(const SkOpSegment*) const;
     SkOpContour* contour() const;
 
-    int debugBumpCount() {
-        return PkDEBUGRELEASE(++fCount, -1);
-    }
+    int debugBumpCount() { return PkDEBUGRELEASE(++fCount, -1); }
 
-    int debugID() const {
-        return PkDEBUGRELEASE(fID, -1);
-    }
+    int debugID() const { return PkDEBUGRELEASE(fID, -1); }
 
 #if DEBUG_COIN
-    void debugAddOpp(SkPathOpsDebug::GlitchLog* , const SkOpSpanBase* opp) const;
+    void debugAddOpp(SkPathOpsDebug::GlitchLog*, const SkOpSpanBase* opp) const;
 #endif
     bool debugAlignedEnd(double t, const SkPoint& pt) const;
     bool debugAlignedInner() const;
     const SkOpAngle* debugAngle(int id) const;
 #if DEBUG_COIN
-    void debugCheckForCollapsedCoincidence(SkPathOpsDebug::GlitchLog* ) const;
+    void debugCheckForCollapsedCoincidence(SkPathOpsDebug::GlitchLog*) const;
 #endif
     const SkOpCoincidence* debugCoincidence() const;
     bool debugCoinEndLoopCheck() const;
@@ -241,15 +216,13 @@ public:
     bool debugDeleted() const { return fDebugDeleted; }
 #endif
 #if DEBUG_COIN
-    void debugInsertCoinEnd(SkPathOpsDebug::GlitchLog* ,
-                            const SkOpSpanBase* ) const;
-    void debugMergeMatches(SkPathOpsDebug::GlitchLog* log,
-                           const SkOpSpanBase* opp) const;
+    void debugInsertCoinEnd(SkPathOpsDebug::GlitchLog*, const SkOpSpanBase*) const;
+    void debugMergeMatches(SkPathOpsDebug::GlitchLog* log, const SkOpSpanBase* opp) const;
 #endif
     const SkOpPtT* debugPtT(int id) const;
     void debugResetCoinT() const;
     const SkOpSegment* debugSegment(int id) const;
-    void debugSetCoinT(int ) const;
+    void debugSetCoinT(int) const;
 #ifdef PK_DEBUG
     void debugSetDeleted() { fDebugDeleted = true; }
 #endif
@@ -258,9 +231,7 @@ public:
     SkOpGlobalState* globalState() const;
     void debugValidate() const;
 
-    bool deleted() const {
-        return fPtT.deleted();
-    }
+    bool deleted() const { return fPtT.deleted(); }
 
     void dump() const;  // available to testing only
     void dumpCoin() const;
@@ -268,13 +239,9 @@ public:
     void dumpBase() const;
     void dumpHead() const;
 
-    bool final() const {
-        return fPtT.fT == 1;
-    }
+    bool final() const { return fPtT.fT == 1; }
 
-    SkOpAngle* fromAngle() const {
-        return fFromAngle;
-    }
+    SkOpAngle* fromAngle() const { return fFromAngle; }
 
     void initBase(SkOpSegment* parent, SkOpSpan* prev, double t, const SkPoint& pt);
 
@@ -295,54 +262,32 @@ public:
     void merge(SkOpSpan* span);
     bool mergeMatches(SkOpSpanBase* opp);
 
-    const SkOpSpan* prev() const {
-        return fPrev;
-    }
+    const SkOpSpan* prev() const { return fPrev; }
 
-    SkOpSpan* prev() {
-        return fPrev;
-    }
+    SkOpSpan* prev() { return fPrev; }
 
-    const SkPoint& pt() const {
-        return fPtT.fPt;
-    }
+    const SkPoint& pt() const { return fPtT.fPt; }
 
-    const SkOpPtT* ptT() const {
-        return &fPtT;
-    }
+    const SkOpPtT* ptT() const { return &fPtT; }
 
-    SkOpPtT* ptT() {
-        return &fPtT;
-    }
+    SkOpPtT* ptT() { return &fPtT; }
 
-    SkOpSegment* segment() const {
-        return fSegment;
-    }
+    SkOpSegment* segment() const { return fSegment; }
 
-    void setAligned() {
-        fAligned = true;
-    }
+    void setAligned() { fAligned = true; }
 
-    void setChased(bool chased) {
-        fChased = chased;
-    }
+    void setChased(bool chased) { fChased = chased; }
 
-    void setFromAngle(SkOpAngle* angle) {
-        fFromAngle = angle;
-    }
+    void setFromAngle(SkOpAngle* angle) { fFromAngle = angle; }
 
-    void setPrev(SkOpSpan* prev) {
-        fPrev = prev;
-    }
+    void setPrev(SkOpSpan* prev) { fPrev = prev; }
 
     bool simple() const {
         fPtT.debugValidate();
         return fPtT.next()->next() == &fPtT;
     }
 
-    int spanAddsCount() const {
-        return fSpanAdds;
-    }
+    int spanAddsCount() const { return fSpanAdds; }
 
     const SkOpSpan* starter(const SkOpSpanBase* end) const {
         const SkOpSpanBase* result = t() < end->t() ? this : end;
@@ -368,48 +313,38 @@ public:
         return result->upCast();
     }
 
-    int step(const SkOpSpanBase* end) const {
-        return t() < end->t() ? 1 : -1;
-    }
+    int step(const SkOpSpanBase* end) const { return t() < end->t() ? 1 : -1; }
 
-    double t() const {
-        return fPtT.fT;
-    }
+    double t() const { return fPtT.fT; }
 
-    void unaligned() {
-        fAligned = false;
-    }
+    void unaligned() { fAligned = false; }
 
     SkOpSpan* upCast() {
         PkASSERT(!final());
-        return (SkOpSpan*) this;
+        return (SkOpSpan*)this;
     }
 
     const SkOpSpan* upCast() const {
         PkOPASSERT(!final());
-        return (const SkOpSpan*) this;
+        return (const SkOpSpan*)this;
     }
 
-    SkOpSpan* upCastable() {
-        return final() ? nullptr : upCast();
-    }
+    SkOpSpan* upCastable() { return final() ? nullptr : upCast(); }
 
-    const SkOpSpan* upCastable() const {
-        return final() ? nullptr : upCast();
-    }
+    const SkOpSpan* upCastable() const { return final() ? nullptr : upCast(); }
 
 private:
     void alignInner();
 
-protected:  // no direct access to internals to avoid treating a span base as a span
-    SkOpPtT fPtT;  // list of points and t values associated with the start of this span
+protected:                  // no direct access to internals to avoid treating a span base as a span
+    SkOpPtT fPtT;           // list of points and t values associated with the start of this span
     SkOpSegment* fSegment;  // segment that contains this span
     SkOpSpanBase* fCoinEnd;  // linked list of coincident spans that end here (may point to itself)
-    SkOpAngle* fFromAngle;  // points to next angle from span start to end
-    SkOpSpan* fPrev;  // previous intersection point
-    int fSpanAdds;  // number of times intersections have been added to span
+    SkOpAngle* fFromAngle;   // points to next angle from span start to end
+    SkOpSpan* fPrev;         // previous intersection point
+    int fSpanAdds;           // number of times intersections have been added to span
     bool fAligned;
-    bool fChased;  // set after span has been added to chase array
+    bool fChased;             // set after span has been added to chase array
     PkDEBUGCODE(int fCount);  // number of pt/t pairs added
     PkDEBUGCODE(int fID);
     PkDEBUGCODE(bool fDebugDeleted);  // set when span was merged with another span
@@ -434,7 +369,7 @@ public:
     }
 
     int computeWindSum();
-    bool containsCoincidence(const SkOpSegment* ) const;
+    bool containsCoincidence(const SkOpSegment*) const;
 
     bool containsCoincidence(const SkOpSpan* coin) const {
         PkASSERT(this != coin);
@@ -449,9 +384,11 @@ public:
 
     bool debugCoinLoopCheck() const;
 #if DEBUG_COIN
-    void debugInsertCoincidence(SkPathOpsDebug::GlitchLog* , const SkOpSpan* ) const;
-    void debugInsertCoincidence(SkPathOpsDebug::GlitchLog* ,
-                                const SkOpSegment* , bool flipped, bool ordered) const;
+    void debugInsertCoincidence(SkPathOpsDebug::GlitchLog*, const SkOpSpan*) const;
+    void debugInsertCoincidence(SkPathOpsDebug::GlitchLog*,
+                                const SkOpSegment*,
+                                bool flipped,
+                                bool ordered) const;
 #endif
     void dumpCoin() const;
     bool dumpSpan() const;
@@ -462,7 +399,7 @@ public:
     }
 
     void init(SkOpSegment* parent, SkOpSpan* prev, double t, const SkPoint& pt);
-    bool insertCoincidence(const SkOpSegment* , bool flipped, bool ordered);
+    bool insertCoincidence(const SkOpSegment*, bool flipped, bool ordered);
 
     // Please keep this in sync with debugInsertCoincidence()
     void insertCoincidence(SkOpSpan* coin) {
@@ -488,9 +425,7 @@ public:
         return fCoincident != this;
     }
 
-    void markAdded() {
-        fAlreadyAdded = true;
-    }
+    void markAdded() { fAlreadyAdded = true; }
 
     SkOpSpanBase* next() const {
         PkASSERT(!final());
@@ -507,7 +442,7 @@ public:
         return fOppValue;
     }
 
-    void release(const SkOpPtT* );
+    void release(const SkOpPtT*);
 
     SkOpPtT* setCoinStart(SkOpSpan* oldCoinStart, SkOpSegment* oppSegment);
 
@@ -545,7 +480,7 @@ public:
         fWindValue = windValue;
     }
 
-    bool sortableTop(SkOpContour* );
+    bool sortableTop(SkOpContour*);
 
     SkOpAngle* toAngle() const {
         PkASSERT(!final());
@@ -562,16 +497,16 @@ public:
         return fWindValue;
     }
 
-private:  // no direct access to internals to avoid treating a span base as a span
+private:                    // no direct access to internals to avoid treating a span base as a span
     SkOpSpan* fCoincident;  // linked list of spans coincident with this one (may point to itself)
-    SkOpAngle* fToAngle;  // points to next angle from span start to end
-    SkOpSpanBase* fNext;  // next intersection point
-    int fWindSum;  // accumulated from contours surrounding this one.
-    int fOppSum;  // for binary operators: the opposite winding sum
-    int fWindValue;  // 0 == canceled; 1 == normal; >1 == coincident
+    SkOpAngle* fToAngle;    // points to next angle from span start to end
+    SkOpSpanBase* fNext;    // next intersection point
+    int fWindSum;           // accumulated from contours surrounding this one.
+    int fOppSum;            // for binary operators: the opposite winding sum
+    int fWindValue;         // 0 == canceled; 1 == normal; >1 == coincident
     int fOppValue;  // normally 0 -- when binary coincident edges combine, opp value goes here
-    int fTopTTry; // specifies direction and t value to try next
-    bool fDone;  // if set, this span to next higher T has been processed
+    int fTopTTry;   // specifies direction and t value to try next
+    bool fDone;     // if set, this span to next higher T has been processed
     bool fAlreadyAdded;
 };
 }  // namespace pk

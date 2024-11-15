@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "include/core/SkTypes.h"
-#include "include/private/SkTo.h"
 #include "src/core/SkMathPriv.h"
+#include "src/core/SkTypes.h"
+#include "src/private/SkTo.h"
 
 #include <utility>
 
@@ -32,28 +32,28 @@ namespace pk {
  */
 template <typename T, typename C>
 void SkTHeapSort_SiftUp(T array[], size_t root, size_t bottom, const C& lessThan) {
-    T x = array[root-1];
+    T x = array[root - 1];
     size_t start = root;
     size_t j = root << 1;
     while (j <= bottom) {
-        if (j < bottom && lessThan(array[j-1], array[j])) {
+        if (j < bottom && lessThan(array[j - 1], array[j])) {
             ++j;
         }
-        array[root-1] = array[j-1];
+        array[root - 1] = array[j - 1];
         root = j;
         j = root << 1;
     }
     j = root >> 1;
     while (j >= start) {
-        if (lessThan(array[j-1], x)) {
-            array[root-1] = array[j-1];
+        if (lessThan(array[j - 1], x)) {
+            array[root - 1] = array[j - 1];
             root = j;
             j = root >> 1;
         } else {
             break;
         }
     }
-    array[root-1] = x;
+    array[root - 1] = x;
 }
 
 /*  Sifts a broken heap. The input array is a heap from root to bottom
@@ -66,21 +66,21 @@ void SkTHeapSort_SiftUp(T array[], size_t root, size_t bottom, const C& lessThan
  */
 template <typename T, typename C>
 void SkTHeapSort_SiftDown(T array[], size_t root, size_t bottom, const C& lessThan) {
-    T x = array[root-1];
+    T x = array[root - 1];
     size_t child = root << 1;
     while (child <= bottom) {
-        if (child < bottom && lessThan(array[child-1], array[child])) {
+        if (child < bottom && lessThan(array[child - 1], array[child])) {
             ++child;
         }
-        if (lessThan(x, array[child-1])) {
-            array[root-1] = array[child-1];
+        if (lessThan(x, array[child - 1])) {
+            array[root - 1] = array[child - 1];
             root = child;
             child = root << 1;
         } else {
             break;
         }
     }
-    array[root-1] = x;
+    array[root - 1] = x;
 }
 
 /** Sorts the array of size count using comparator lessThan using a Heap Sort algorithm. Be sure to
@@ -190,8 +190,7 @@ void SkTIntroSort(int depth, T* left, int count, const C& lessThan) {
  *  @param end points past the end of the region to be sorted
  *  @param lessThan a functor/lambda which returns true if a comes before b.
  */
-template <typename T, typename C>
-void SkTQSort(T* begin, T* end, const C& lessThan) {
+template <typename T, typename C> void SkTQSort(T* begin, T* end, const C& lessThan) {
     int n = SkToInt(end - begin);
     if (n <= 1) {
         return;
