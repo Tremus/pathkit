@@ -1793,10 +1793,6 @@ SkPathFirstDirection SkPathPriv::ComputeFirstDirection(const SkPath& path) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static bool between(SkScalar a, SkScalar b, SkScalar c) {
-  return (a - b) * (c - b) <= 0;
-}
-
 static SkScalar eval_cubic_pts(SkScalar c0, SkScalar c1, SkScalar c2, SkScalar c3, SkScalar t) {
   SkScalar A = c3 + 3 * (c1 - c2) - c0;
   SkScalar B = 3 * (c2 - c1 - c1 + c0);

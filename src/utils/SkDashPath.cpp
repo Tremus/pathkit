@@ -66,17 +66,6 @@ void SkDashPath::CalcDashParameters(SkScalar phase, const SkScalar intervals[], 
                                             initialDashIndex, count);
 }
 
-static void outset_for_stroke(SkRect* rect, const SkStrokeRec& rec) {
-    SkScalar radius = PkScalarHalf(rec.getWidth());
-    if (0 == radius) {
-        radius = PK_Scalar1;    // hairlines
-    }
-    if (SkPaint::kMiter_Join == rec.getJoin()) {
-        radius *= rec.getMiter();
-    }
-    rect->outset(radius, radius);
-}
-
 // If line is zero-length, bump out the end by a tiny amount
 // to draw endcaps. The bump factor is sized so that
 // SkPoint::Distance() computes a non-zero length.
@@ -158,7 +147,15 @@ static bool cull_path(const SkPath& srcPath, const SkStrokeRec& rec,
 
     SkRect bounds;
     bounds = *cullRect;
-    outset_for_stroke(&bounds, rec);
+    // outset_for_stroke
+    SkScalar radius = PkScalarHalf(rec.getWidth());
+    if (0 == radius) {
+        radius = PK_Scalar1;    // hairlines
+    }
+    if (SkPaint::kMiter_Join == rec.getJoin()) {
+        radius *= rec.getMiter();
+    }
+    bounds.outset(radius, radius);
 
     {
         SkPoint pts[2];

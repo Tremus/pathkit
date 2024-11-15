@@ -12,6 +12,11 @@
 #include "include/private/SkTemplates.h"
 
 namespace pk {
+
+// This was originally developed and tested for pathops: see SkOpTypes.h
+// returns true if (a <= b <= c) || (a >= b >= c)
+static bool between(SkScalar a, SkScalar b, SkScalar c) { return (a - b) * (c - b) <= 0; }
+
 static inline Sk2s from_point(const SkPoint& point) { return Sk2s::Load(&point); }
 
 static inline SkPoint to_point(const Sk2s& x) {

@@ -1064,10 +1064,6 @@ int SkConic::computeQuadPOW2(SkScalar tol) const {
     return pow2;
 }
 
-// This was originally developed and tested for pathops: see SkOpTypes.h
-// returns true if (a <= b <= c) || (a >= b >= c)
-static bool between(SkScalar a, SkScalar b, SkScalar c) { return (a - b) * (c - b) <= 0; }
-
 static SkPoint* subdivide(const SkConic& src, SkPoint pts[], int level) {
     if (0 == level) {
         memcpy(pts, &src.fPts[1], 2 * sizeof(SkPoint));
