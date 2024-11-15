@@ -22,6 +22,6 @@ class SkCubicClipper {
 public:
     static bool PK_WARN_UNUSED_RESULT ChopMonoAtY(const SkPoint pts[4], SkScalar y, SkScalar* t);
 private:
-    SkRect      fClip;
+    // SkRect      fClip;
 };
 }  // namespace pk

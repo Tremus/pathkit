@@ -145,7 +145,7 @@ public:
     bool onFilterPath(SkPath* dst, const SkPath& src, SkStrokeRec* rec,
                       const SkRect* cullRect, const SkMatrix& ctm) const override {
         // use bit-or so that we always call both, even if the first one succeeds
-        return fPE0->filterPath(dst, src, rec, cullRect, ctm) |
+        return fPE0->filterPath(dst, src, rec, cullRect, ctm) ||
                fPE1->filterPath(dst, src, rec, cullRect, ctm);
     }
 
