@@ -1423,7 +1423,7 @@ private:
 };
 
 SkPathConvexity SkPath::computeConvexity() const {
-    auto setComputedConvexity = [=](SkPathConvexity convexity) {
+    auto setComputedConvexity = [this](SkPathConvexity convexity) {
         this->setConvexity(convexity);
         return convexity;
     };
